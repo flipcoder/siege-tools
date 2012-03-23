@@ -1,11 +1,22 @@
 #!/usr/bin/env python
 import os, sys
 
-app_settings = {}
+PROGRAM_NAME = "Siege-Tools SiegeMake (\"sgmake\")"
+PROGRAM_VERSION = "0.1"
+
+user_settings = {}
+app_options = []
+app_actions = []
+app_arg_map = {}
+app_valid_anywhere = ["help", "?"]
+app_valid_options = app_valid_anywhere + ["version"]
+app_valid_keys = []
+app_valid_actions = app_valid_anywhere + ["list"]
+
 def settings_load(fn):
     try:
         with open("~"+os.sep+fn) as source:
-            eval(compile(source.read(), fn, 'exec'), {}, app_settings)
+            eval(compile(source.read(), fn, 'exec'), {}, user_settings)
         return True
     except IOError:
         return False
@@ -14,6 +25,64 @@ for fn in (".sgrc", "_sgrc"):
         break
 def settings():
     return app_settings
+
+def arg_option(s):
+    if s in app_options:
+        return True
+    return False
+
+def arg_value(s):
+    if s in app_arg_map:
+        return app_arg_map[s]
+    return None
+
+def arg_action(s):
+    if s in app_actions:
+        return True
+    return False
+
+def arg_anywhere(s):
+    if s in app_actions or s in app_options:
+        return True
+    return False
+
+for arg in sys.argv[1:]:
+    arg = arg.lower()
+    if arg.startswith("--"):
+        if '=' in arg:
+            idx = arg.find("=")
+            key = arg[2:idx]
+            try:
+                value = arg[idx+1:]
+            except:
+                print "Invalid formatting for parameter \'%s\'" % arg
+                break
+                
+            if idx != -1:
+                app_arg_map[key] = value
+        
+            app_options.append(arg[2:])
+    elif arg.startswith("-"):
+        arg = arg[1:]
+        if arg in app_valid_options:
+            app_options.append(arg)
+        else:
+            print "Invalid paramter \'%s\'" % arg
+    else:
+        if arg in app_valid_actions:
+            app_actions.append(arg);
+        else:
+            print "Invalid action \'%s\'" % arg
+
+def splash():
+    print("%s %s" % (PROGRAM_NAME, PROGRAM_VERSION))
+    print("Copyright (c) 2012 Grady O'Connell")
+    print("See README for details.")
+
+def help():
+    splash()
+    print("")
+    print("Commands: %s" % ", ".join(app_valid_actions))
 
 class Project:
     def __init__(self, fn):
@@ -61,8 +130,6 @@ class Project:
         if not self.build_sys:
             self.error = True
             return
-
-        print("Found %s (%s)" % (self.name, self.build_sys))
 
     def configure(self):
         if not os.path.isdir(os.path.join(os.getcwd(), "src")):
@@ -193,20 +260,42 @@ class Project:
 
         return True
        
+def do_project(fn):
+    project = Project(fn)
+
+    if not project.error:
+        print "%s [%s]" % (project.name, project.build_sys)
+
+    # only list details on list command
+    if arg_action("list"):
+        return 0
+
+    if not project.error:
+        return 1 if project.complete() else -1
+
+    return 0
+
 def main():
+    
+    if arg_option("version"):
+        splash()
+        return
+    if arg_anywhere("help") or arg_anywhere("?"):
+        help()
+        return
+
     wdir = os.getcwd();
-    built_count = 0
+    success_count = 0
     failed_count = 0
 
-    project = Project(wdir)
-    if not project.error:
-        if project.complete():
-            built_count = built_count + 1
-        else:
-            failed_count = failed_count + 1
+    r = do_project(".");
+    if r == 1:
+        success_count = success_count + 1
+    elif r == -1:
+        failed_count = failed_count + 1
 
     # recurse once if no project
-    if project.error:
+    if r == 0:
         for fn in os.listdir("."):
             if fn.startswith("."):
                 continue
@@ -216,17 +305,19 @@ def main():
                 continue
 
             os.chdir(os.path.join(wdir, fn));
-            project = Project(fn)
-            if not project.error:
-                if project.complete():
-                    built_count = built_count + 1
-                else:
-                    failed_count = failed_count + 1
+            r = do_project(fn);
+            if r == 1:
+                success_count = success_count + 1
+            elif r == -1:
+                failed_count = failed_count + 1
+
             os.chdir(wdir)
 
-    if failed_count:
-        print("%s project(s) failed." % failed_count)
-    print("%s project(s) completed." % built_count)
+    if not arg_action("list"):
+        if failed_count:
+            print("%s project(s) failed." % failed_count)
+        else:
+            print("%s project(s) completed." % success_count)
 
 if __name__ == "__main__":
     main()

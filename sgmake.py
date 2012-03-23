@@ -217,12 +217,11 @@ def main():
 
             os.chdir(os.path.join(wdir, fn));
             project = Project(fn)
-            if project.error:
-                continue
-            if project.complete():
-                built_count = built_count + 1
-            else:
-                failed_count = failed_count + 1
+            if not project.error:
+                if project.complete():
+                    built_count = built_count + 1
+                else:
+                    failed_count = failed_count + 1
             os.chdir(wdir)
 
     if failed_count:

@@ -3,26 +3,55 @@ import os, sys
 
 PROGRAM_NAME = "Siege-Tools SiegeMake (\"sgmake\")"
 PROGRAM_VERSION = "0.1"
+PROGRAM_COPYRIGHT = "Copyright (c) 2012 Grady O'Connell"
 
 user_settings = {}
+
+# sgmake option
+# sgmake --command
+# sgmake -a
+# sgmake --mapkey=mapvalue
+
 app_options = []
-app_actions = []
+app_commands = []
 app_arg_map = {}
+
+# arg 'anywhere' means either option or command, both work
 app_valid_anywhere = ["help", "?"]
-app_valid_options = app_valid_anywhere + ["version"]
-app_valid_keys = []
-app_valid_actions = app_valid_anywhere + ["list"]
+app_valid_options = app_valid_anywhere + ["version", "verbose", "strict"]
+app_valid_keys = ["generate"]
+app_valid_commands = app_valid_anywhere + ["list", "debug"]
+
+app_command_alias = {"ls":"list"} # not yet implemented
+
+
+def splash():
+    print("%s %s" % (PROGRAM_NAME, PROGRAM_VERSION))
+    print(PROGRAM_COPYRIGHT)
+    print("See README for details.")
+
+def commands():
+    print("Commands: %s" % ", ".join(app_valid_commands))
+
+def help():
+    splash()
+    print("")
+    commands()
+
 
 def settings_load(fn):
     try:
-        with open("~"+os.sep+fn) as source:
+        fn = os.environ['HOME']+os.sep+fn
+        with open(fn) as source:
             eval(compile(source.read(), fn, 'exec'), {}, user_settings)
         return True
     except IOError:
         return False
-for fn in (".sgrc", "_sgrc"):
+
+for fn in (".sgrc.py", "_sgrc.py"):
     if settings_load(fn):
         break
+
 def settings():
     return app_settings
 
@@ -36,13 +65,13 @@ def arg_value(s):
         return app_arg_map[s]
     return None
 
-def arg_action(s):
-    if s in app_actions:
+def arg_command(s):
+    if s in app_commands:
         return True
     return False
 
 def arg_anywhere(s):
-    if s in app_actions or s in app_options:
+    if s in app_commands or s in app_options:
         return True
     return False
 
@@ -55,85 +84,93 @@ for arg in sys.argv[1:]:
             try:
                 value = arg[idx+1:]
             except:
-                print "Invalid formatting for parameter \'%s\'" % arg
-                break
+                print "No key specified for parameter \'%s\'" % arg
+                exit(1)
+                #break
                 
-            if idx != -1:
+            if key not in app_valid_map:
+                print "Invalid parameter \'%s\'" % arg
+                exit(1)
+
+            if key not in app_arg_map:
                 app_arg_map[key] = value
-        
-            app_options.append(arg[2:])
+            #app_options.append(key)
+        else:
+            if arg not in app_valid_options:
+                print "Invalid parameter \'%s\'" % arg
+                exit(1)
+            if arg not in app_options:
+                app_options.append(arg)
     elif arg.startswith("-"):
-        arg = arg[1:]
-        if arg in app_valid_options:
-            app_options.append(arg)
-        else:
+    #    arg = arg[1:]
+    #    if arg in app_valid_options:
+    #        app_options.append(arg)
+    #    else:
+
+        arg_letters = arg[1:]
+        if (len(arg_letters) == 0):
             print "Invalid paramter \'%s\'" % arg
+            exit(1)
+
+        # if user passes something like -version ("anywhere" command), allow it as a normal parameter,
+        # instead of each letter -v -e -r -s... etc.
+        if arg_letters in app_valid_anywhere:
+            app_options.append(arg_letters)
+            continue
+
+        # otherwise look through each letter for each parameter meaning
+        for ch in arg_letters:
+            matched_arg = False
+            num_matches = 0
+            for arg_name in app_options:
+                if ch == arg_name[:1]:
+                    if arg_name not in app_options:
+                        app_options.append(arg_name)
+                    matched_arg = True
+                elif ch == arg_name[:1].upper():
+                    # uses secondary match if the letter is capitalized
+                    # example: -v matches version, -V matches verbose
+                    if num_matches > 1: 
+                        app_options.append(arg_name)
+                        matched_arg
+                    num_matches += 1
+                    
+            if not matched_arg:
+                print "Invalid parameter \'-%s\'" % ch
+                exit(1)
+
     else:
-        if arg in app_valid_actions:
-            app_actions.append(arg);
+        # no prefix dashes (-) on argument means its an command/command
+        if arg in app_valid_commands:
+            app_commands.append(arg);
         else:
-            print "Invalid action \'%s\'" % arg
+            print "Invalid command \'%s\'" % arg
+            commands()
+            exit(1)
 
-def splash():
-    print("%s %s" % (PROGRAM_NAME, PROGRAM_VERSION))
-    print("Copyright (c) 2012 Grady O'Connell")
-    print("See README for details.")
+class Status:
+    UNSET=0
+    SUCCESS=1
+    FAILURE=2
+    UNSUPPORTED=3
 
-def help():
-    splash()
-    print("")
-    print("Commands: %s" % ", ".join(app_valid_actions))
+class BuildSystem(object):
+    pass
 
-class Project:
-    def __init__(self, fn):
-        self.error = False
-
-        self.filename = fn
-        self.name = os.path.basename(fn)
-
-        self.build_sys = None
-
-        self.obfuscator = None
-        self.signer = None
-        self.packager = None
-
-        self.sourcepath = None
-        self.classpath = None
+class Java(BuildSystem):
+    def __init__(self, project):
         self.manifest = None
-        
-        # Build system
-        if not self.build_sys:
-            for fn in os.listdir("."):
-                if os.path.isfile(fn):
-                    fn_lower = fn.lower();
-                    if fn_lower.endswith(".mf"):
-                        self.build_sys = "java"
-                        self.manifest = fn
-                        self.classpath = []
-                        self.sourcepath = ["src"]
-                    elif fn_lower=="makefile":
-                        self.build_sys = "make"
-                        self.build_script = fn;
-                    elif fn_lower=="premake4.lua" or fn_lower=="premake.lua":
-                        self.build_sys = "premake"
-                        self.build_script = fn;
-                    elif fn_lower=="cmakelists.txt":
-                        self.build_sys = "cmake"
-                        self.build_script = fn;
+        self.name = "java"
+        self.project = project
+        self.sourcepath = ["src"]
+        self.classpath = []
 
-        # Project config
-        for fn in os.listdir("."):
-            if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py") and len(fn.lower())>len(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                with open(fn) as source:
-                    eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
-
-        if not self.build_sys:
-            self.error = True
-            return
+    def __str__(self):
+        return self.name
 
     def configure(self):
         if not os.path.isdir(os.path.join(os.getcwd(), "src")):
-            return False
+            return Status.FAILURE
 
         for folder in ("bin","dist"):
             try:
@@ -141,14 +178,9 @@ class Project:
             except OSError:
                 pass
 
-        # TODO: Add more languages
-        if not self.build_sys == "java":
-            return False
-
-        return True
+        return Status.SUCCESS
 
     def make(self):
-        
         classpath = ".";
         
         classpathlist = []
@@ -209,74 +241,140 @@ class Project:
         #print(classpath_param)
         os.system("javac -Xlint:unchecked -source 1.6 -target 1.6 -d bin  %s -cp %s" % (sourcepath, classpath))
         os.system("jar cmf %s dist"%(self.manifest)+os.sep+"%s.jar -C bin ." % (self.name))
-
-        return True
+        return Status.SUCCESS
 
     def obfuscate(self):
-        return True
+        return Status.UNSUPPORTED
 
     def sign(self):
-        return True
+        try:
+            os.system("jarsigner -storepass %s %s %s" % (user_settings["keystore_pass"], fn, user_settings["keystore_name"]))
+            # if system call returns with error, then return Status.FAILURE, regardless of --strict
+        except:
+            return Status.FAILURE if app_options["strict"] else Status.UNSUPPORTED
 
+        return Status.SUCCESS
+    
     def package(self):
-        return True
-
+        return Status.UNSUPPORTED
     def install(self):
-        return True
+        return Status.UNSUPPORTED
+
+class Project:
+
+    def __init__(self, filename):
+        self.status = Status.UNSET
+
+        self.filename = filename
+        self.name = os.path.basename(os.path.abspath(filename))
+
+        self.build_sys = None
+        
+        # Build system
+        #if not self.build_sys:
+        #    try:
+        #        self.build_sys = arg_value("build-system")
+        #    except NameError:
+        #        pass
+
+        if not self.build_sys:
+            for fn in os.listdir("."):
+                if os.path.isfile(fn):
+                    fn_lower = fn.lower();
+                    if fn_lower.endswith(".mf"):
+                        self.build_sys = Java(self)
+                        self.manifest = fn
+                        # TODO: detect obfuscator from project
+                    #elif fn_lower=="makefile":
+                    #    self.build_sys = "make"
+                    #    self.build_script = fn;
+                    #elif fn_lower=="premake4.lua" or fn_lower=="premake.lua":
+                    #    self.build_sys = "premake"
+                    #    self.build_script = fn;
+                    #elif fn_lower=="cmakelists.txt":
+                    #    self.build_sys = "cmake"
+                    #    self.build_script = fn;
+
+        if not self.build_sys:
+            # last ditch effort to detect build type by prevalence of filetypes
+            pass
+
+        # Project config
+        for fn in os.listdir("."):
+            if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
+                with open(fn) as source:
+                    # hackish name swap so we can use "name" in the project settings
+                    self.name, self.build_sys.name = self.build_sys.name, self.name
+                    eval(compile(source.read(), fn, 'exec'), {}, self.build_sys.__dict__)
+                    self.name, self.build_sys.name = self.build_sys.name, self.name
+                    
+
+        if not self.build_sys:
+            self.status = Status.UNSUPPORTED
+            return
 
     def complete(self):
         print("Configuring %s..." % self.name)
-        if not self.configure():
+        status = self.build_sys.configure()
+        if status == Status.SUCCESS:
+            print("Configured %s." % self.name)
+        elif status == Status.FAILURE:
             return False
-        print("Configured %s." % self.name)
 
         print("Building %s..." % self.name)
-        if not self.make():
+        status = self.build_sys.make()
+        if status == Status.SUCCESS:
+            print("Built %s." % self.name)
+        elif status == Status.FAILURE:
             return False
-        print("Built %s." % self.name)
 
-        if self.obfuscator:
-            print("Obfuscating %s..." % self.name)
-            if not self.obfuscate():
-                return False
+        print("Obfuscating %s..." % self.name)
+        status = self.build_sys.obfuscate()
+        if status == Status.SUCCESS:
             print("Obfuscated %s." % self.name)
+        elif status == Status.FAILURE:
+            return False
 
-        if self.signer:
-            print("Signing %s..." % self.name)
-            if not self.sign():
-                return False
+        print("Signing %s..." % self.name)
+        status = self.build_sys.sign()
+        if status == Status.SUCCESS:
             print("Signed %s." % self.name)
+        elif status == Status.FAILURE:
+            return False
 
-        if self.packager:
-            print("Packaging %s..." % self.name)
-            if not self.package():
-                return False
+        print("Packaging %s..." % self.name)
+        status = self.build_sys.package()
+        if status == Status.SUCCESS:
             print("Packaged %s." % self.name)
+        elif status == Status.FAILURE:
+            return False
 
         print("Installing %s..." % self.name)
-        if not self.install():
+        status = self.build_sys.install()
+        if status == Status.SUCCESS:
+            print("Installed %s." % self.name)
+        elif status == Status.FAILURE:
             return False
-        print("Installed %s." % self.name)
 
         return True
        
 def do_project(fn):
     project = Project(fn)
 
-    if not project.error:
+    if not project.status == Status.UNSUPPORTED:
         print "%s [%s]" % (project.name, project.build_sys)
 
     # only list details on list command
-    if arg_action("list"):
+    if arg_command("list"):
         return 0
 
-    if not project.error:
+    if not project.status == Status.UNSUPPORTED:
         return 1 if project.complete() else -1
 
     return 0
 
 def main():
-    
+
     if arg_option("version"):
         splash()
         return
@@ -290,9 +388,9 @@ def main():
 
     r = do_project(".");
     if r == 1:
-        success_count = success_count + 1
+        success_count += 1
     elif r == -1:
-        failed_count = failed_count + 1
+        failed_count += 1
 
     # recurse once if no project
     if r == 0:
@@ -307,13 +405,13 @@ def main():
             os.chdir(os.path.join(wdir, fn));
             r = do_project(fn);
             if r == 1:
-                success_count = success_count + 1
+                success_count += 1
             elif r == -1:
-                failed_count = failed_count + 1
+                failed_count += 1
 
             os.chdir(wdir)
 
-    if not arg_action("list"):
+    if not arg_command("list"):
         if failed_count:
             print("%s project(s) failed." % failed_count)
         else:

@@ -299,6 +299,10 @@ class Project:
             # last ditch effort to detect build type by prevalence of filetypes
             pass
 
+        if not self.build_sys:
+            self.status = Status.UNSUPPORTED
+            return
+
         # Project config
         for fn in os.listdir("."):
             if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
@@ -307,11 +311,7 @@ class Project:
                     self.name, self.build_sys.name = self.build_sys.name, self.name
                     eval(compile(source.read(), fn, 'exec'), {}, self.build_sys.__dict__)
                     self.name, self.build_sys.name = self.build_sys.name, self.name
-                    
-
-        if not self.build_sys:
-            self.status = Status.UNSUPPORTED
-            return
+        
 
     def complete(self):
         print("Configuring %s..." % self.name)

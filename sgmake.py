@@ -159,20 +159,20 @@ class BuildSystem(object):
     pass
 
 class Java(BuildSystem):
-    def __init__(self, project):
+    def __init__(self, fn):
         self.manifest = None
-        self.project = project
-        self.name = None
+        self.name = os.path.basename(os.path.abspath(fn))
         self.sourcepath = ["src"]
         self.classpath = []
         self.obfuscator = None
+        self.output = None
 
     def __str__(self):
         return "java"
 
     def clean(self):
         try:
-            os.remove("dist"+os.sep+self.project.name+".jar")
+            os.remove("dist"+os.sep+self.name+".jar")
         except OSError:
             pass
         return Status.SUCCESS
@@ -238,31 +238,36 @@ class Java(BuildSystem):
                         else:
                             sourcepath = os.path.join(rel_path,fn)
 
-        javapath = ""
+        self.javapath = ""
         try:
-            javapath = user_settings['java_path']
+            self.javapath = user_settings['java_path']
             if user_settings['java_path'][-1] != os.sep and os.altsep and user_settings['java_path'][-1] != os.altsep:
-                javapath += os.sep
+                self.javapath += os.sep
         except:
             pass
 
+        self.output = "dist"+os.sep+self.name+".jar"
+
         # TODO: boostrap class path
-        os.system("%sjavac -Xlint:unchecked -source 1.6 -target 1.6 -d bin  %s -cp %s" % (javapath, sourcepath, classpath))
-        os.system("%sjar cmf %s dist"%(javapath, self.manifest)+os.sep+"%s.jar -C bin ." % (self.project.name))
+        os.system("%sjavac -Xlint:unchecked -source 1.6 -target 1.6 -d bin %s -cp %s" % (self.javapath, sourcepath, classpath))
+        os.system("%sjar cmf %s "%(self.javapath, self.manifest)+"%s -C bin ." % (self.output))
         
-        if not os.path.isfile("dist"+os.sep+self.project.name+".jar"):
+        if not os.path.isfile(self.output):
             return Status.FAILURE
 
         return Status.SUCCESS
 
     def obfuscate(self):
         if self.obfuscator: # obfuscator used for project
-            try:
-                bin_path = user_settings["%s_path" % self.obfuscator.name]
-                if not os.isfile(bin_path):
-                    return Status.FAILURE
-            except:
-                return Status.UNSUPPORTED
+            #try:
+            obf_path = user_settings["%s_path" % self.obfuscator]
+            obf_path = os.path.abspath(obf_path)
+            print self.javapath + "java -jar " + obf_path
+            if not os.path.isfile(obf_path):
+                return Status.FAILURE
+            os.system(self.javapath + "java -jar " + obf_path + " " + self.obfuscator_params)
+            #except:
+            #    return Status.UNSUPPORTED
 
             return Status.SUCCESS
 
@@ -270,7 +275,7 @@ class Java(BuildSystem):
 
     def sign(self):
         try:
-            os.system("jarsigner -storepass %s %s %s" % (user_settings["keystore_pass"], "dist"+os.sep+self.project.name+".jar", user_settings["keystore_name"]))
+            os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, user_settings["keystore_pass"], self.output, user_settings["keystore_name"]))
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
             return Status.FAILURE if app_options["strict"] else Status.UNSUPPORTED
@@ -286,10 +291,7 @@ class Project:
 
     def __init__(self, filename):
         self.status = Status.UNSET
-
         self.filename = filename
-        self.name = os.path.basename(os.path.abspath(filename))
-
         self.build_sys = None
         
         # Build system
@@ -304,8 +306,8 @@ class Project:
                 if os.path.isfile(fn):
                     fn_lower = fn.lower();
                     if fn_lower.endswith(".mf"):
-                        self.build_sys = Java(self)
-                        self.manifest = fn
+                        self.build_sys = Java(filename)
+                        self.build_sys.manifest = fn
                         # TODO: detect obfuscator from project
                     #elif fn_lower=="makefile":
                     #    self.build_sys = "make"
@@ -330,57 +332,59 @@ class Project:
             if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
                 with open(fn) as source:
                     eval(compile(source.read(), fn, 'exec'), {}, self.build_sys.__dict__)
+
+        self.name = self.build_sys.name
         
 
     def complete(self):
         # TODO: Eventually combine these all into "steps"
         
-        print("Cleaning %s..." % self.name)
+        print("Cleaning %s..." % self.build_sys.name)
         status = self.build_sys.clean()
         if status == Status.SUCCESS:
             print("Cleaned %s." % self.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Configuring %s..." % self.name)
+        print("Configuring %s..." % self.build_sys.name)
         status = self.build_sys.configure()
         if status == Status.SUCCESS:
-            print("Configured %s." % self.name)
+            print("Configured %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Building %s..." % self.name)
+        print("Building %s..." % self.build_sys.name)
         status = self.build_sys.make()
         if status == Status.SUCCESS:
-            print("Built %s." % self.name)
+            print("Built %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Obfuscating %s..." % self.name)
+        print("Obfuscating %s..." % self.build_sys.name)
         status = self.build_sys.obfuscate()
         if status == Status.SUCCESS:
-            print("Obfuscated %s." % self.name)
+            print("Obfuscated %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Signing %s..." % self.name)
+        print("Signing %s..." % self.build_sys.name)
         status = self.build_sys.sign()
         if status == Status.SUCCESS:
-            print("Signed %s." % self.name)
+            print("Signed %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Packaging %s..." % self.name)
+        print("Packaging %s..." % self.build_sys.name)
         status = self.build_sys.package()
         if status == Status.SUCCESS:
-            print("Packaged %s." % self.name)
+            print("Packaged %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 
-        print("Installing %s..." % self.name)
+        print("Installing %s..." % self.build_sys.name)
         status = self.build_sys.install()
         if status == Status.SUCCESS:
-            print("Installed %s." % self.name)
+            print("Installed %s." % self.build_sys.name)
         elif status == Status.FAILURE:
             return False
 

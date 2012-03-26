@@ -2,7 +2,7 @@
 import os, sys
 
 PROGRAM_NAME = "Siege-Tools SiegeMake (\"sgmake\")"
-PROGRAM_VERSION = "0.1"
+PROGRAM_VERSION = "0.2.0"
 PROGRAM_COPYRIGHT = "Copyright (c) 2012 Grady O'Connell"
 
 user_settings = {}
@@ -19,6 +19,7 @@ app_arg_map = {}
 # arg 'anywhere' means either option or command, both work
 app_valid_anywhere = ["help", "?"]
 app_valid_options = app_valid_anywhere + ["version", "verbose", "strict"]
+# TODO: interactive, ...
 app_valid_keys = ["generate"]
 app_valid_commands = app_valid_anywhere + ["list", "debug"]
 
@@ -160,13 +161,21 @@ class BuildSystem(object):
 class Java(BuildSystem):
     def __init__(self, project):
         self.manifest = None
-        self.name = "java"
         self.project = project
+        self.name = None
         self.sourcepath = ["src"]
         self.classpath = []
+        self.obfuscator = None
 
     def __str__(self):
-        return self.name
+        return "java"
+
+    def clean(self):
+        try:
+            os.remove("dist"+os.sep+self.project.name+".jar")
+        except OSError:
+            pass
+        return Status.SUCCESS
 
     def configure(self):
         if not os.path.isdir(os.path.join(os.getcwd(), "src")):
@@ -209,11 +218,6 @@ class Java(BuildSystem):
             classpath = classpath + os.pathsep + os.pathsep.join(self.classpath)
         else:
             classpath = string.join(self.classpath,os.pathsep)
-        
-
-        #f = open("sg-cache"+os.sep+"classpath_file_list", "w");
-        #f.write(classpath);
-        #f.close()
 
         sourcepath = ""
 
@@ -234,22 +238,40 @@ class Java(BuildSystem):
                         else:
                             sourcepath = os.path.join(rel_path,fn)
 
-        #f = open("sg-cache"+os.sep+"source_file_list", "w");
-        #f.write(sourcepath);
-        #f.close()
+        javapath = ""
+        try:
+            javapath = user_settings['java_path']
+            if user_settings['java_path'][-1] != os.sep and os.altsep and user_settings['java_path'][-1] != os.altsep:
+                javapath += os.sep
+        except:
+            pass
 
-        #print(classpath_param)
-        os.system("javac -Xlint:unchecked -source 1.6 -target 1.6 -d bin  %s -cp %s" % (sourcepath, classpath))
-        os.system("jar cmf %s dist"%(self.manifest)+os.sep+"%s.jar -C bin ." % (self.name))
+        # TODO: boostrap class path
+        os.system("%sjavac -Xlint:unchecked -source 1.6 -target 1.6 -d bin  %s -cp %s" % (javapath, sourcepath, classpath))
+        os.system("%sjar cmf %s dist"%(javapath, self.manifest)+os.sep+"%s.jar -C bin ." % (self.project.name))
+        
+        if not os.path.isfile("dist"+os.sep+self.project.name+".jar"):
+            return Status.FAILURE
+
         return Status.SUCCESS
 
     def obfuscate(self):
+        if self.obfuscator: # obfuscator used for project
+            try:
+                bin_path = user_settings["%s_path" % self.obfuscator.name]
+                if not os.isfile(bin_path):
+                    return Status.FAILURE
+            except:
+                return Status.UNSUPPORTED
+
+            return Status.SUCCESS
+
         return Status.UNSUPPORTED
 
     def sign(self):
         try:
-            os.system("jarsigner -storepass %s %s %s" % (user_settings["keystore_pass"], fn, user_settings["keystore_name"]))
-            # if system call returns with error, then return Status.FAILURE, regardless of --strict
+            os.system("jarsigner -storepass %s %s %s" % (user_settings["keystore_pass"], "dist"+os.sep+self.project.name+".jar", user_settings["keystore_name"]))
+            # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
             return Status.FAILURE if app_options["strict"] else Status.UNSUPPORTED
 
@@ -307,13 +329,19 @@ class Project:
         for fn in os.listdir("."):
             if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
                 with open(fn) as source:
-                    # hackish name swap so we can use "name" in the project settings
-                    self.name, self.build_sys.name = self.build_sys.name, self.name
                     eval(compile(source.read(), fn, 'exec'), {}, self.build_sys.__dict__)
-                    self.name, self.build_sys.name = self.build_sys.name, self.name
         
 
     def complete(self):
+        # TODO: Eventually combine these all into "steps"
+        
+        print("Cleaning %s..." % self.name)
+        status = self.build_sys.clean()
+        if status == Status.SUCCESS:
+            print("Cleaned %s." % self.name)
+        elif status == Status.FAILURE:
+            return False
+
         print("Configuring %s..." % self.name)
         status = self.build_sys.configure()
         if status == Status.SUCCESS:

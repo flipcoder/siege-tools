@@ -276,6 +276,14 @@ class Java(BuildSystem):
     def sign(self):
         try:
             os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, user_settings["keystore_pass"], self.output, user_settings["keystore_name"]))
+            
+            # sign libs too (TODO: make optional)
+            for classpath_dir in self.classpath:
+                for fn in os.listdir(classpath_dir):
+                    if fn.lower().endswith(".jar"):
+                        os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, user_settings["keystore_pass"], os.path.join(classpath_dir,fn), user_settings["keystore_name"]))
+                            
+                            
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
             return Status.FAILURE if app_options["strict"] else Status.UNSUPPORTED

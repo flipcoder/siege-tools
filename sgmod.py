@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Siege-Tools SiegeMod (\"sgmod\")
-Multi-Langauge Preprocesser
+Multi-Langauge Preprocessor
 Copyright (c) 2012 Grady O'Connell
 """
 import os, sys

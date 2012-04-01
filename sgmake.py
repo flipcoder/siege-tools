@@ -9,22 +9,21 @@ import os, sys
 from common import Args
 from common import Settings
 
-app_valid_anywhere = ["help", "?"]
-Args.app_valid_options = app_valid_anywhere + ["version", "verbose", "strict"]
-# TODO: interactive, ...
-Args.app_valid_keys = ["generate"]
-Args.app_valid_commands = app_valid_anywhere + ["list", "debug"]
-Args.app_command_alias = {"ls":"list"} # not yet implemented
+Args.valid_anywhere= ["help"]
+Args.valid_options = ["version", "verbose", "strict"]
+Args.valid_commands = ["list", "debug"]
+Args.valid_keys = []
+Args.command_aliases = {"?":"help", "ls":"list"}
+Args.process()
 
 def splash():
     print __doc__
 
 def commands():
-    print("Commands: %s" % ", ".join(Args.app_valid_commands))
+    print("Commands: %s" % ", ".join(Args.valid_commands))
 
 def help():
     splash()
-    print("")
     commands()
 
 class Status:
@@ -49,59 +48,22 @@ class Project:
     
 
     def complete(self):
-        # TODO: Eventually combine these all into "steps"
-        
-        print("Cleaning %s..." % self.name)
-        status = self.clean()
-        if status == Status.SUCCESS:
-            print("Cleaned %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Configuring %s..." % self.name)
-        status = self.configure()
-        if status == Status.SUCCESS:
-            print("Configured %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Building %s..." % self.name)
-        status = self.make()
-        if status == Status.SUCCESS:
-            print("Built %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Obfuscating %s..." % self.name)
-        status = self.obfuscate()
-        if status == Status.SUCCESS:
-            print("Obfuscated %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Signing %s..." % self.name)
-        status = self.sign()
-        if status == Status.SUCCESS:
-            print("Signed %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Packaging %s..." % self.name)
-        status = self.package()
-        if status == Status.SUCCESS:
-            print("Packaged %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
-
-        print("Installing %s..." % self.name)
-        status = self.install()
-        if status == Status.SUCCESS:
-            print("Installed %s." % self.name)
-        elif status == Status.FAILURE:
-            return False
+        i = 1
+        for step in ("clean","configure","make","obfuscate","sign","package","install"):
+            step_name = step[0].upper() + step[1:]
+            print "%s Step %s: %s..." % (self.name, i, step_name)
+            i += 1
+            status = getattr(self, step)()
+            if status == Status.SUCCESS:
+                print("%s finished." % step_name)
+            elif status == Status.FAILURE:
+                return False
+            elif status == Status.UNSUPPORTED:
+                print("%s unsupported." % step_name)
 
         return True
 
+# TODO: separate language from system
 class Java(Project):
     def __init__(self, fn):
         Project.__init__(self, fn)
@@ -232,7 +194,7 @@ class Java(Project):
                             
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
-            return Status.FAILURE if Args.app_options["strict"] else Status.UNSUPPORTED
+            return Status.FAILURE if Args.options["strict"] else Status.UNSUPPORTED
 
         return Status.SUCCESS
     

@@ -21,6 +21,13 @@ Args.app_command_alias = {
     "do":"done",
     "x":"done"
 }
+Args.allow_strings = True
+
+class Task:
+    def __init__(self, title):
+        self.title = title
+    def __str__(self):
+        return self.title
 
 def splash():
     print __doc__

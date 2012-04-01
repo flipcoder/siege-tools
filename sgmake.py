@@ -17,7 +17,7 @@ Args.app_valid_commands = app_valid_anywhere + ["list", "debug"]
 Args.app_command_alias = {"ls":"list"} # not yet implemented
 
 def splash():
-    print __doc__.strip()
+    print __doc__
 
 def commands():
     print("Commands: %s" % ", ".join(Args.app_valid_commands))

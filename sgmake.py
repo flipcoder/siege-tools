@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
-version 0.3.0
+Version 0.3.0
 Copyright (c) 2012 Grady O'Connell
 """
 

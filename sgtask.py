@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Siege-Tools SiegeTask (\"sgtask\")
 CLI Task Planning
-version 0.0.1
+Version 0.0.1
 Copyright (c) 2012 Grady O'Connell
 """
 

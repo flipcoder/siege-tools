@@ -20,6 +20,6 @@ Siege Tools is a collection of CLI developer tools designed to bring more IDE fu
     - a work in progress :)
 
 - SiegeMod (sgmod) is...
-    - a python preprocessor that works with any language
+    - a multi-language preprocessor
     - a work in progress :)
 

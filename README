@@ -19,15 +19,6 @@ Components
     Notes:
         It's not supposed to be perfect in every scenario, just designed to make the best guesses based on what it can figure out about the project
         For grabbing libraries where nothing is available in package repos (like on windows), sgmake should scan for libraries on the internet (and should prompt user before downloading one, to approve of the origin site)
-
-Planned:
-- Refactoring tool (should work on directories and filter by filetypes)
-- Basic filetype templates
-- A CLI todo list app that can track and jump to TODO entries in source code
-- Vim plug-in
-- Cross-language preprocessor
-
-Maybe:
-- Project management and time tracking
-- Sync-friendly (through Dropbox or something similar)
+- SiegeTask (work in progress)
+- SiegeMod (work in progress)
 

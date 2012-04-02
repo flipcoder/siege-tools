@@ -6,11 +6,10 @@ Version 0.3.0
 Copyright (c) 2012 Grady O'Connell
 """
 
-import os, sys, imp
+import os, sys
 from common import Args
 from common import Settings
-#from yapsy.PluginManager import PluginManager
-#from yapsy.IPlugin import IPlugin
+import addons
 
 def splash():
     print __doc__.strip()
@@ -40,7 +39,7 @@ class Status:
 #        print "deactivate"
 #        pass
 
-class Project:
+class Project(object):
 
     def __init__(self, filename):
         self.status = Status.UNSET
@@ -212,7 +211,8 @@ class Java(Project):
         return Status.UNSUPPORTED
 
 
-def ProjectFactory(filename):
+def detect_project(filename):
+    # TODO do dispatch with detector/hint addons
     for fn in os.listdir("."):
         if os.path.isfile(fn):
             fn_lower = fn.lower()
@@ -234,7 +234,7 @@ def ProjectFactory(filename):
     return None
 
 def try_project(fn):
-    project = ProjectFactory(fn)
+    project = detect_project(fn)
 
     if project and not project.status == Status.UNSUPPORTED:
         print "%s [%s]" % (project.name, project.build_sys)
@@ -256,6 +256,8 @@ def main():
     Args.valid_keys = []
     Args.command_aliases = {"?":"help", "ls":"list"}
     Args.process()
+
+    addons.process()
 
     #plugins = PluginManager(plugin_info_ext="sgmake-addon")
     #plugins.setPluginPlaces(["sgmake-addons"])

@@ -1,29 +1,26 @@
 #!/usr/bin/env python
-"""Siege-Tools SiegeMake (\"sgmake\")
+"""
+Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
 Version 0.3.0
 Copyright (c) 2012 Grady O'Connell
 """
 
-import os, sys
+import os, sys, imp
 from common import Args
 from common import Settings
-
-Args.valid_anywhere= ["help"]
-Args.valid_options = ["version", "verbose", "strict"]
-Args.valid_commands = ["list", "debug"]
-Args.valid_keys = []
-Args.command_aliases = {"?":"help", "ls":"list"}
-Args.process()
+#from yapsy.PluginManager import PluginManager
+#from yapsy.IPlugin import IPlugin
 
 def splash():
-    print __doc__
+    print __doc__.strip()
 
 def commands():
     print("Commands: %s" % ", ".join(Args.valid_commands))
 
 def help():
     splash()
+    print()
     commands()
 
 class Status:
@@ -31,6 +28,17 @@ class Status:
     SUCCESS=1
     FAILURE=2
     UNSUPPORTED=3
+
+#class IAddon(IPlugin):
+#    def __init__(self):
+#        print "init"
+#        pass
+#    def activate(self):
+#        print "activate"
+#        pass
+#    def deactivate(self):
+#        print "deactivate"
+#        pass
 
 class Project:
 
@@ -99,7 +107,7 @@ class Java(Project):
         return Status.SUCCESS
 
     def make(self):
-        classpath = ".";
+        classpath = "."
         
         classpathlist = []
         classpathlist += ("lib", "libs")
@@ -207,7 +215,7 @@ class Java(Project):
 def ProjectFactory(filename):
     for fn in os.listdir("."):
         if os.path.isfile(fn):
-            fn_lower = fn.lower();
+            fn_lower = fn.lower()
             # TODO: loop through all registered project (build) type addons and run their test
             if fn_lower.endswith(".mf"):
                 project = Java(filename)
@@ -216,13 +224,13 @@ def ProjectFactory(filename):
                 return project
             #elif fn_lower=="makefile":
             #    self.build_sys = "make"
-            #    self.build_script = fn;
+            #    self.build_script = fn
             #elif fn_lower=="premake4.lua" or fn_lower=="premake.lua":
             #    self.build_sys = "premake"
-            #    self.build_script = fn;
+            #    self.build_script = fn
             #elif fn_lower=="cmakelists.txt":
             #    self.build_sys = "cmake"
-            #    self.build_script = fn;
+            #    self.build_script = fn
     return None
 
 def try_project(fn):
@@ -242,6 +250,20 @@ def try_project(fn):
 
 def main():
 
+    Args.valid_anywhere= ["help"]
+    Args.valid_options = ["version", "verbose", "strict"]
+    Args.valid_commands = ["list", "debug"]
+    Args.valid_keys = []
+    Args.command_aliases = {"?":"help", "ls":"list"}
+    Args.process()
+
+    #plugins = PluginManager(plugin_info_ext="sgmake-addon")
+    #plugins.setPluginPlaces(["sgmake-addons"])
+    #plugins.collectPlugins()
+    #for p in plugins.getAllPlugins():
+    #    print p.name
+    #    plugins.activatePluginByName(p.name)
+
     if Args.option("version"):
         splash()
         return
@@ -249,11 +271,11 @@ def main():
         help()
         return
 
-    wdir = os.getcwd();
+    wdir = os.getcwd()
     success_count = 0
     failed_count = 0
 
-    r = try_project(".");
+    r = try_project(".")
     if r == 1:
         success_count += 1
     elif r == -1:
@@ -269,8 +291,8 @@ def main():
             if os.path.islink(os.path.join(wdir, fn)):
                 continue
 
-            os.chdir(os.path.join(wdir, fn));
-            r = try_project(fn);
+            os.chdir(os.path.join(wdir, fn))
+            r = try_project(fn)
             if r == 1:
                 success_count += 1
             elif r == -1:

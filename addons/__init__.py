@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import sys,os, imp
 
-all_addons = {}
+base = {}
 
 def process_path(path):
     global base
@@ -12,7 +12,8 @@ def process_path(path):
 
     for fn in os.listdir(path):
         if fn.lower().endswith(".py") and not fn.lower() == "__init__.py":
-            all_addons[fn] = __import__(fn[:-3], globals(), locals(), [], -1)
+            name = fn[:-3]
+            base[name] = __import__(name, globals(), locals(), [], -1)
             #if hasattr(base[fn],"category"): # TODO addon categories
         elif os.path.isdir(os.path.join(path,fn)):
             base[fn] = __import__(fn, globals(), locals(), [], -1)

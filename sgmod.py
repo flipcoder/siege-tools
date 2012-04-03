@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-"""Siege-Tools SiegeMod (\"sgmod\")
+"""
+Siege-Tools SiegeMod (\"sgmod\")
 Multi-Language Preprocessor
 Version 0.0.1
 Copyright (c) 2012 Grady O'Connell

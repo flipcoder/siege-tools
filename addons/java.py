@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 import os
-from sgmake import *
+import sgmake
+from common import Settings
 
-class Java(Project):
+class Project(sgmake.Project):
     def __init__(self):
-        Project.__init__(self)
+        sgmake.Project.__init__(self)
 
         self.manifest = ""
         for fn in os.listdir("."):
@@ -22,7 +23,7 @@ class Java(Project):
 
         self.run_user_script()
 
-        self.status = Status.SUCCESS
+        self.status = sgmake.Status.SUCCESS
 
     @staticmethod
     def compatible():
@@ -37,7 +38,7 @@ class Java(Project):
             os.remove("dist"+os.sep+self.name+".jar")
         except OSError:
             pass
-        return Status.SUCCESS
+        return sgmake.Status.SUCCESS
 
     def configure(self):
         if not os.path.isdir(os.path.join(os.getcwd(), "src")):
@@ -49,7 +50,7 @@ class Java(Project):
             except OSError:
                 pass
 
-        return Status.SUCCESS
+        return sgmake.Status.SUCCESS
 
     def make(self):
         classpath = "."
@@ -114,9 +115,9 @@ class Java(Project):
         os.system("%sjar cmf %s "%(self.javapath, self.manifest)+"%s -C bin ." % (self.output))
         
         if not os.path.isfile(self.output):
-            return Status.FAILURE
+            return sgmake.Status.FAILURE
 
-        return Status.SUCCESS
+        return sgmake.Status.SUCCESS
 
     def obfuscate(self):
         if self.obfuscator: # obfuscator used for project
@@ -125,14 +126,14 @@ class Java(Project):
             obf_path = os.path.abspath(obf_path)
             print self.javapath + "java -jar " + obf_path
             if not os.path.isfile(obf_path):
-                return Status.FAILURE
+                return sgmake.Status.FAILURE
             os.system(self.javapath + "java -jar " + obf_path + " " + self.obfuscator_params)
             #except:
-            #    return Status.UNSUPPORTED
+            #    return sgmake.Status.UNSUPPORTED
 
-            return Status.SUCCESS
+            return sgmake.Status.SUCCESS
 
-        return Status.UNSUPPORTED
+        return sgmake.Status.UNSUPPORTED
 
     def sign(self):
         try:
@@ -147,13 +148,12 @@ class Java(Project):
                             
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
-            return Status.FAILURE if Args.options["strict"] else Status.UNSUPPORTED
+            return sgmake.Status.FAILURE if Args.options["strict"] else sgmake.Status.UNSUPPORTED
 
-        return Status.SUCCESS
+        return sgmake.Status.SUCCESS
     
     def package(self):
-        return Status.UNSUPPORTED
+        return sgmake.Status.UNSUPPORTED
     def install(self):
-        return Status.UNSUPPORTED
+        return sgmake.Status.UNSUPPORTED
 
-overload = Java

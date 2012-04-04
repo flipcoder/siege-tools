@@ -2,7 +2,7 @@
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
-Version 0.3.0
+Version 0.4.0
 Copyright (c) 2012 Grady O'Connell
 """
 
@@ -62,9 +62,9 @@ class Project(object):
 
 def detect_project():
 
-    for cls in addons.base.values():
-        if cls.overload.compatible():
-            return cls.overload()
+    for addon in addons.base.values():
+        if addon.Project.compatible():
+            return addon.Project()
 
     return None
 

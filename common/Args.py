@@ -81,9 +81,12 @@ def process():
                 print "Invalid paramter \'%s\'" % arg
                 exit(1)
 
-            # if user passes something like -version ("anywhere" command), allow it as a normal parameter,
+            # if user passes something like -version, allow it as a normal parameter,
             # instead of each letter -v -e -r -s... etc.
-            if letters in valid_anywhere:
+            #if letters in valid_anywhere:
+            #    options.append(letters)
+            #    continue
+            if letters in valid_options:
                 options.append(letters)
                 continue
 

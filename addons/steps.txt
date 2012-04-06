@@ -1,0 +1,35 @@
+The subdirectories represent a step in the build process.
+They have different behavior and may be called in a different
+order depending on the project, user config, and step status.
+Some steps are optional, also depending on the factors above.
+
+detect
+    begin the process by detecting the project settings and deciding
+    on the steps available to the user. Multiple detectors can be used
+    on a given project
+clean
+    Deals with removal of past project binaries and clearing
+    output directories
+preprocess
+    Calls sgmod and/or external preprocessors
+resolver
+    Attempts to resolve dependencies based on the current environment
+make
+    The central last minute configuration, compilation, and building
+obfuscate
+    Call to an obfuscator if necessary
+doc
+    Call to documentation generator(s)
+sign
+    Digitally sign code or packages as needed, based on user config
+    May occur in different order, depending on whats to be signed
+package
+    generate packages or installers
+install
+    automatic installation of packages on a local machine
+test
+    a placeholder for unit tests that need to be part of the build process
+deploy
+    any project-specific code for uploading or sending files
+    to a particular destination
+

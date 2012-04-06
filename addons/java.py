@@ -2,6 +2,7 @@
 import os
 import sgmake
 from common import Settings
+from common import Args
 
 class Project(sgmake.Project):
     def __init__(self):
@@ -15,12 +16,16 @@ class Project(sgmake.Project):
 
         self.name = os.path.basename(os.path.abspath(os.getcwd()))
         self.sourcepath = ["src"]
-        self.classpath = []
+        self.classpath = ["lib","libs"]
         self.obfuscator = None
         self.output = None
-        self.build_sys = "java"
-        self.steps = ("clean","configure","make","obfuscate","sign","package","install")
-
+        self.classdir = "bin"
+        self.outputdir = "dist"
+        self.language = "java"
+        self.src_ext = ["java"]
+        self.bin_ext = ["jar"]
+        self.steps = ("clean","make","obfuscate","sign","package","install")
+        self.javac_params = ["-Xlint:unchecked"]
         self.run_user_script()
 
         self.status = sgmake.Status.SUCCESS
@@ -35,30 +40,26 @@ class Project(sgmake.Project):
 
     def clean(self):
         try:
-            os.remove("dist"+os.sep+self.name+".jar")
+            os.remove(os.path.join(self.outputdir, "%s.%s" % (self.name,self.bin_ext)))
         except OSError:
             pass
+        # TODO: try to delete class files in classdir
         return sgmake.Status.SUCCESS
 
-    def configure(self):
-        if not os.path.isdir(os.path.join(os.getcwd(), "src")):
-            return Status.FAILURE
+    def make(self):
+        for folder in self.sourcepath:
+            if not os.path.isdir(os.path.join(os.getcwd(), folder)):
+                return Status.FAILURE
 
-        for folder in ("bin","dist"):
+        for folder in (self.classdir,self.outputdir):
             try:
                 os.mkdir(os.path.join(os.getcwd(), folder))
             except OSError:
                 pass
 
-        return sgmake.Status.SUCCESS
-
-    def make(self):
         classpath = "."
         
-        classpathlist = []
-        classpathlist += ("lib", "libs")
-        if self.classpath:
-            classpathlist += self.classpath
+        classpathlist = self.classpath
 
         for entry in classpathlist:
             if os.path.isfile(entry):
@@ -69,7 +70,7 @@ class Project(sgmake.Project):
                 continue
             for (path, dirs, files) in os.walk(os.path.join(os.getcwd(), entry)):
                 for fn in files:
-                    if fn.lower().endswith(".jar"):
+                    if fn.lower().endswith(".%s" % self.bin_ext):
                         rel_path = os.path.relpath(path,fn)
                         rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
                         if classpath:
@@ -93,13 +94,14 @@ class Project(sgmake.Project):
                 continue
             for (path, dirs, files) in os.walk(os.path.join(os.getcwd(), entry)):
                 for fn in files:
-                    if fn.lower().endswith(".java"):
-                        rel_path = os.path.relpath(path,fn)
-                        rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
-                        if sourcepath:
-                            sourcepath = sourcepath + " " + os.path.join(rel_path,fn)
-                        else:
-                            sourcepath = os.path.join(rel_path,fn)
+                    for ext in self.src_ext:
+                        if fn.lower().endswith(".%s" % ext):
+                            rel_path = os.path.relpath(path,fn)
+                            rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
+                            if sourcepath:
+                                sourcepath = "%s %s" % (sourcepath, os.path.join(rel_path,fn))
+                            else:
+                                sourcepath = os.path.join(rel_path,fn)
 
         self.javapath = Settings.get('java_path')
         if self.javapath:
@@ -111,8 +113,11 @@ class Project(sgmake.Project):
         self.output = "dist"+os.sep+self.name+".jar"
 
         # TODO: boostrap class path
-        os.system("%sjavac -Xlint:unchecked -source 1.6 -target 1.6 -d bin %s -cp %s" % (self.javapath, sourcepath, classpath))
-        os.system("%sjar cmf %s "%(self.javapath, self.manifest)+"%s -C bin ." % (self.output))
+        # removed: -source 1.6 -target 1.6 
+        misc_params = " ".join(self.javac_params)
+        os.system("%sjavac %s -d %s %s -cp %s" % (self.javapath, misc_params, self.classdir, sourcepath, classpath))
+        os.system("%sjar cmf %s %s -C %s ." % (self.javapath, self.manifest, self.output, self.classdir))
+        # TODO wrap stdout from above commands and detect errors
         
         if not os.path.isfile(self.output):
             return sgmake.Status.FAILURE
@@ -124,7 +129,6 @@ class Project(sgmake.Project):
             #try:
             obf_path = Settings.get("%s_path" % self.obfuscator)
             obf_path = os.path.abspath(obf_path)
-            print self.javapath + "java -jar " + obf_path
             if not os.path.isfile(obf_path):
                 return sgmake.Status.FAILURE
             os.system(self.javapath + "java -jar " + obf_path + " " + self.obfuscator_params)
@@ -142,13 +146,13 @@ class Project(sgmake.Project):
             # sign libs too (TODO: make optional)
             for classpath_dir in self.classpath:
                 for fn in os.listdir(classpath_dir):
-                    if fn.lower().endswith(".jar"):
+                    if fn.lower().endswith(".%s" % self.bin_ext):
                         os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, Settings.get("keystore_pass"), os.path.join(classpath_dir,fn), Settings.get("keystore_name")))
                             
                             
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         except:
-            return sgmake.Status.FAILURE if Args.options["strict"] else sgmake.Status.UNSUPPORTED
+            return sgmake.Status.FAILURE if Args.option("strict") else sgmake.Status.UNSUPPORTED
 
         return sgmake.Status.SUCCESS
     

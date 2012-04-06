@@ -168,6 +168,8 @@ def do_add(tasks):
     return True
 
 def main():
+    print "Note: This tool is not complete nor functional.  Don't expect much..."
+
     arg_idx = 1
     token = arg(arg_idx)
 

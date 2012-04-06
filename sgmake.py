@@ -63,8 +63,11 @@ class Project(object):
 def detect_project():
 
     for addon in addons.base.values():
-        if addon.Project.compatible():
-            return addon.Project()
+        try:
+            if addon.Project.compatible():
+                return addon.Project()
+        except:
+            pass
 
     return None
 
@@ -73,7 +76,7 @@ def try_project(fn):
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
-        print "%s [%s]" % (project.name, project.build_sys)
+        print "%s [%s]" % (project.name, project.language)
 
     # only list details on list command
     if Args.command("list"):
@@ -123,6 +126,7 @@ def main():
                 continue
 
             os.chdir(os.path.join(wdir, fn))
+
             r = try_project(fn)
             if r == 1:
                 success_count += 1
@@ -134,8 +138,10 @@ def main():
     if not Args.command("list"):
         if failed_count:
             print("%s project(s) failed." % failed_count)
-        else:
+        elif success_count:
             print("%s project(s) completed." % success_count)
+        else:
+            print("Nothing to be done.")
 
 
 if __name__ == "__main__":

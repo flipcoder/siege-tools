@@ -9,6 +9,8 @@ def process_path(path):
         return
     if not os.path.abspath(path) in sys.path:
         sys.path.append(path)
+    if not os.path.abspath(os.path.join(path,"steps")) in sys.path:
+        sys.path.append(os.path.join(path,"steps"))
 
     for fn in os.listdir(path):
         if fn.lower().endswith(".py") and not fn.lower() == "__init__.py":

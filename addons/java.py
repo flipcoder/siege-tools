@@ -23,7 +23,7 @@ class Project(sgmake.Project):
         self.outputdir = "dist"
         self.language = "java"
         self.src_ext = ["java"]
-        self.bin_ext = ["jar"]
+        self.bin_ext = "jar"
         self.steps = ("clean","make","obfuscate","sign","package","install")
         self.javac_params = ["-Xlint:unchecked"]
         self.run_user_script()
@@ -57,14 +57,13 @@ class Project(sgmake.Project):
             except OSError:
                 pass
 
-        classpath = "."
-        
-        classpathlist = self.classpath
+        classpath = ""
+        #classpathlist = os.pathsep.join(self.classpath)
 
-        for entry in classpathlist:
+        for entry in self.classpath:
             if os.path.isfile(entry):
                 if classpath:
-                    classpath = classpath + os.pathsep + entry
+                    classpath += os.pathsep + entry
                 else:
                     classpath = entry
                 continue
@@ -74,14 +73,14 @@ class Project(sgmake.Project):
                         rel_path = os.path.relpath(path,fn)
                         rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
                         if classpath:
-                            classpath = classpath + os.pathsep + os.path.join(rel_path,fn)
+                            classpath = os.pathsep.join((classpath, os.path.join(rel_path,fn)))
                         else:
                             classpath = os.path.join(rel_path,fn)
 
         if classpath:
-            classpath = classpath + os.pathsep + os.pathsep.join(self.classpath)
+            classpath = os.pathsep.join((classpath, os.pathsep.join(self.classpath)))
         else:
-            classpath = string.join(self.classpath,os.pathsep)
+            classpath = os.pathsep.join(self.classpath)
 
         sourcepath = ""
 

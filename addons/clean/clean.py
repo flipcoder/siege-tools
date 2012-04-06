@@ -7,6 +7,3 @@ from common import Settings
 def clean(project):
     return Status.UNSUPPORTED
 
-def compatible(project):
-    return False
-

@@ -32,4 +32,6 @@ test
 deploy
     any project-specific code for uploading or sending files
     to a particular destination
+notify
+    a user or project reserved step to notify when a build process has finished
 

@@ -8,21 +8,30 @@ See LICENSE for more information
 =======================================
 
 ## Purpose ##
-Siege Tools is a collection of CLI developer tools designed to bring more IDE functionality back to the command line
+Siege Tools is a collection of cross-platform CLI developer tools designed to bring more IDE functionality back to the command line
 
 ## Components ##
-- SiegeMake (sgmake) is
-    - a multi-language, extensible build system wrapper
+- SiegeMake (sgmake)
+    - a multi-language, extensible build system
+    - a wrapper for projects using other build systems
     - an automatic build system detector and autoconfigurer
-    - a wrapper around current systems (ant, cmake, premake, etc.)
-    - a dependency resolver (eventually)
+    - a wrapper around current systems (make, cmake, premake, etc.)
+    - a cross-platform dependency resolver (eventually)
+    - supports more advanced build steps such as obfuscation and digital signing
 
-- SiegeTask (sgtask) is...
-    - a project planner
-    - a TODO list task tree
+- SiegeMod (sgmod)
+    - a multi-language, extensible preprocessor
+    - compatible with sgmake (above)
+    - a state machine of custom switches for your project
+    - does not require embedding incompatible code like other preprocessors
+    - manipulate source code from an external script similar to manipulating DOM
     - a work in progress :)
 
-- SiegeMod (sgmod) is...
-    - a multi-language preprocessor
-    - a work in progress :)
+## Contributing ##
+If you find this project useful, consider contributing or spreading the word to other developers.
+Once the addon system is done, I could use contributors to write addon steps for different languages and build systems.
+My primary plan is to implement my most familiar languages first (C/C++(+ autotools/make/cmake/premake/scons), Java(+ ant/maven), Vala), and move on from there.
+
+## Contact ##
+Contact me at flipcoder@gmail.com for questions, comments, etc.
 

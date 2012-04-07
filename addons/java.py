@@ -39,10 +39,7 @@ class Project(sgmake.Project):
         return False
 
     def clean(self):
-        try:
-            os.remove(os.path.join(self.outputdir, "%s.%s" % (self.name,self.bin_ext)))
-        except OSError:
-            pass
+        os.remove(os.path.join(self.outputdir, "%s%s%s" % (self.name, "." if self.bin_ext else "",self.bin_ext)))
         # TODO: try to delete class files in classdir
         return sgmake.Status.SUCCESS
 
@@ -127,6 +124,8 @@ class Project(sgmake.Project):
         if self.obfuscator: # obfuscator used for project
             #try:
             obf_path = Settings.get("%s_path" % self.obfuscator)
+            if not obf_path:
+                return sgmake.Status.UNSUPPORTED
             obf_path = os.path.abspath(obf_path)
             if not os.path.isfile(obf_path):
                 return sgmake.Status.FAILURE
@@ -139,19 +138,20 @@ class Project(sgmake.Project):
         return sgmake.Status.UNSUPPORTED
 
     def sign(self):
-        try:
-            os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, Settings.get("keystore_pass"), self.output, Settings.get("keystore_name")))
-            
-            # sign libs too (TODO: make optional)
-            for classpath_dir in self.classpath:
+        #try:
+        os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, Settings.get("keystore_pass"), self.output, Settings.get("keystore_name")))
+        
+        # sign libs too (TODO: make optional)
+        for classpath_dir in self.classpath:
+            if os.path.isdir(classpath_dir):
                 for fn in os.listdir(classpath_dir):
                     if fn.lower().endswith(".%s" % self.bin_ext):
                         os.system("%sjarsigner -storepass %s %s %s" % (self.javapath, Settings.get("keystore_pass"), os.path.join(classpath_dir,fn), Settings.get("keystore_name")))
                             
-                            
             # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
-        except:
-            return sgmake.Status.FAILURE if Args.option("strict") else sgmake.Status.UNSUPPORTED
+        #except:
+        #    return sgmake.Status.FAILURE
+            #return sgmake.Status.FAILURE if Args.option("strict") else sgmake.Status.UNSUPPORTED
 
         return sgmake.Status.SUCCESS
     

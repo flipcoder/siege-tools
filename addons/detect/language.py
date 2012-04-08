@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-#import sgmake
 import os
 import collections
+from common import Status
 
 def detect(project):
     project.extensions = collections.defaultdict(int)
@@ -11,4 +11,5 @@ def detect(project):
                 project.extensions[os.path.splitext(fn)[1][1:].lower()] += 1
             except:
                 pass
+    return Status.SUCCESS
 

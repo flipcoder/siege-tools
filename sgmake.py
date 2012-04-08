@@ -9,6 +9,7 @@ Copyright (c) 2012 Grady O'Connell
 import os, sys
 from common import Args
 from common import Settings
+from common import Status
 import addons
 
 def splash():
@@ -22,52 +23,68 @@ def help():
     print()
     commands()
 
-class Status:
-    UNSET=0
-    SUCCESS=1
-    FAILURE=2
-    UNSUPPORTED=3
-
 class Project(object):
 
     def __init__(self):
         self.status = Status.UNSET
-        self.name = os.path.basename(os.path.abspath(os.getcwd()))
-        self.steps = ()
+        self.steps = []
 
-    def run_user_script(self):
+    def run_user_script(self, script):
         ## Project config
         for fn in os.listdir("."):
-            if (fn.lower()=="sg.py" or fn.lower().endswith(".sg.py")) and os.path.isfile(os.path.join(os.getcwd(), fn)):
+            if (fn.lower()==script or fn.lower().endswith(".%s" % script)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
                 with open(fn) as source:
                     eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
     
-
     def complete(self):
+        self.run_user_script("sg.py")
+
+        # update all plugins after script runs
+        for step in self.steps:
+            addons.update(step[0], step[1], self)
+
         i = 1
         for step in self.steps:
-            step_name = step[0].upper() + step[1:]
-            print "%s Step %s: %s..." % (self.name, i, step_name)
+            step_name = step[0][0].upper() + step[0][1:] # capitalize step name
+            print "%s step (addon: %s)..." % (step_name,  step[1])
             i += 1
-            status = getattr(self, step)()
-            if status == Status.SUCCESS:
-                print("%s finished." % step_name)
-            elif status == Status.FAILURE:
+            #status = getattr(self, step)()
+            status = addons.step(step[0], step[1], self)
+            #if status == Status.SUCCESS:
+            #    #print("...%s finished." % step_name)
+            if status == Status.FAILURE:
                 return False
             elif status == Status.UNSUPPORTED:
-                print("%s unsupported." % step_name)
+                print("...%s unsupported." % step_name)
 
         return True
 
 
 def detect_project():
 
-    for addon in addons.base.values():
-        try:
-            if addon.Project.compatible():
-                return addon.Project()
-        except:
-            pass
+    #for addon in addons.base.values():
+    #    try:
+    #        if addon.Project.compatible():
+    #            return addon.Project()
+    #    except:
+    #        pass
+
+    project = Project()
+    # Run all detection addons
+    for addon in addons.steps["detect"]:
+        if not addons.step("detect", addon, project):
+            return None
+    # Add required steps to project
+    for addon_type in addons.steps.iterkeys():
+        if addon_type == "detect":
+            continue
+        for addon in addons.steps[addon_type]:
+            if addons.compatible(addon_type, addon, project):
+                project.steps += [(addon_type, addon)]
+
+    # If project contains steps, its a project
+    if project.steps:
+        return project
 
     return None
 
@@ -76,7 +93,7 @@ def try_project(fn):
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
-        print "%s [%s]" % (project.name, project.language)
+        print "[%s]" % project.name
 
     # only list details on list command
     if Args.command("list"):

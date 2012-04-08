@@ -5,5 +5,7 @@ from sgmake import Status
 from common import Settings
 
 def clean(project):
-    return Status.UNSUPPORTED
+    # TODO Clean files and folders listed in project.clean
+    #  Should obey wildcards (*) and recursive wildcards (**)
+    return Status.SUCCESS
 

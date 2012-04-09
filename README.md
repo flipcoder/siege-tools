@@ -12,6 +12,7 @@ Siege Tools is a collection of cross-platform CLI developer tools designed to br
 It attempts to solve common tedious tasks involved with programming in a way that works with multiple platforms and languages.
 
 ## Components ##
+
 - SiegeMake (sgmake)
     - a multi-language, extensible build system
     - a wrapper for projects using other build systems
@@ -20,16 +21,16 @@ It attempts to solve common tedious tasks involved with programming in a way tha
     - a cross-platform dependency resolver (eventually)
     - supports more advanced build steps such as obfuscation and digital signing
 
+## Future ##
+
 - SiegeMod (sgmod)
     - a multi-language, extensible preprocessor
     - compatible with sgmake (above)
     - a state machine of custom switches for your project
     - does not require embedding incompatible code like other preprocessors
     - manipulate source code from an external script similar to manipulating DOM
-    - a work in progress :)
 
-## Future ##
-More tools and integration into vim as plugins
+- Vim plugins for each tool
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

@@ -8,7 +8,8 @@ See LICENSE for more information
 =======================================
 
 ## Purpose ##
-Siege Tools is a collection of cross-platform CLI developer tools designed to bring more IDE functionality back to the command line
+Siege Tools is a collection of cross-platform CLI developer tools designed to bring more IDE-like functionality back to the command line.
+It attempts to solve common tedious tasks involved with programming in a way that works with multiple platforms and languages.
 
 ## Components ##
 - SiegeMake (sgmake)
@@ -26,6 +27,9 @@ Siege Tools is a collection of cross-platform CLI developer tools designed to br
     - does not require embedding incompatible code like other preprocessors
     - manipulate source code from an external script similar to manipulating DOM
     - a work in progress :)
+
+## Future ##
+More tools and integration into vim as plugins
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

@@ -5,13 +5,6 @@ from sgmake import Status
 from common import Settings
 
 def make(project):
-    project.makepath = Settings.get('make_path')
-    if project.makepath:
-        if project.makepath[-1] != os.sep and os.altsep and Settings.get('make_path')[-1] != os.altsep:
-            project.makepath += os.sep
-    else:
-        project.makepath = ""
-
     premake = ""
     if os.path.isfile("premake4.lua"):
         premake = "premake4"
@@ -24,8 +17,16 @@ def make(project):
     return Status.SUCCESS
 
 def update(project):
+    project.makepath = Settings.get('make_path')
+    if project.makepath:
+        if project.makepath[-1] != os.sep and os.altsep and Settings.get('make_path')[-1] != os.altsep:
+            project.makepath += os.sep
+    else:
+        project.makepath = ""
+
     # make sure theres a make step after premake
     make_step = ("make","make")
+    project.clean_commands = ["%smake clean" % project.makepath]
     clean_step = ("clean", "clean")
     if make_step in project.steps:
         project.steps.remove(make_step)

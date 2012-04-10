@@ -38,20 +38,31 @@ steps = collections.OrderedDict([
 
 def step(group, addon, project):
     if group in steps and addon in steps[group]:
-        if hasattr(steps[group][addon], group):
+        try:
             return getattr(steps[group][addon], group)(project)
+        except:
+            pass
     return 0
 
+def method(group, addon, method, project, default):
+    try:
+        return getattr(steps[group][addon], method)(project)
+    except:
+        pass
+    return default
+
+def method2(group, addon, method, project, user, default):
+    try:
+        return getattr(steps[group][addon], method)(project,user)
+    except:
+        pass
+    return default
+
 def compatible(group, addon, project):
-    #print steps[group][addon]
-    #print "%s %s" % (group,addon)
-    if hasattr(steps[group][addon], "compatible"):
-        return getattr(steps[group][addon], "compatible")(project)
-    return False
+    return method(group,addon,"compatible",project,False)
 
 def update(group, addon, project):
-    if hasattr(steps[group][addon], "update"):
-        getattr(steps[group][addon], "update")(project)
+    return method(group,addon,"update",project,None)
 
 # minimum requirements for a project
 def is_project(project):

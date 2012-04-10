@@ -7,15 +7,18 @@ import subprocess
 import sgmake
 from sgmake import Status
 from common import Settings
-from addons import resolver
+#from addons import resolver
+#import addons
 
 # dependency resolvers are silent steps, they are called by other steps as needed
 
 def resolve(project, lib):
     name = resolver.simplify_package_name(lib)
-    matches = subprocess.check_output(["apt-cache", "search", name]).split(os.linesep)
-    for m in matches:
+    matches = subprocess.check_output(["apt-cache", "search", name])
+    for m in matches.split(os.linesep):
         print m
+    return None
+    # TODO determine best match, run through project.resolver
     
 def compatible(project):
     if not sys.platform.startswith("linux"):

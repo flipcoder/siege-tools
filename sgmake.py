@@ -82,10 +82,11 @@ def detect_project():
             if addons.compatible(addon_type, addon, project):
                 project.steps += [(addon_type, addon)]
 
-    # If project contains steps, its a project
-    if project.steps:
+    # check if project meets standards for a sgmake project
+    if addons.is_project(project):
         return project
-
+    
+    # otherwise, no project detected
     return None
 
 def try_project(fn):

@@ -38,7 +38,8 @@ steps = collections.OrderedDict([
 
 def step(group, addon, project):
     if group in steps and addon in steps[group]:
-        return getattr(steps[group][addon], group)(project)
+        if hasattr(steps[group][addon], group):
+            return getattr(steps[group][addon], group)(project)
     return 0
 
 def compatible(group, addon, project):
@@ -51,6 +52,13 @@ def compatible(group, addon, project):
 def update(group, addon, project):
     if hasattr(steps[group][addon], "update"):
         getattr(steps[group][addon], "update")(project)
+
+# minimum requirements for a project
+def is_project(project):
+    for step in project.steps:
+        if step[0] in ("make","package"):
+            return True
+    return False
 
 def process_path(path):
     global base

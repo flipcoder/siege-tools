@@ -3,7 +3,6 @@ import os
 import sgmake
 from sgmake import Status
 from common import Settings
-import addons
 
 def make(project):
     

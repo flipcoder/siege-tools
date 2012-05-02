@@ -7,8 +7,6 @@ import subprocess
 import sgmake
 from sgmake import Status
 from common import Settings
-#from addons import resolver
-#import addons
 
 # dependency resolvers are silent steps, they are called by other steps as needed
 

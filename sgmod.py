@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """
 Siege-Tools SiegeMod (\"sgmod\")
 Multi-Language Preprocessor

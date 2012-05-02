@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
@@ -10,7 +10,7 @@ import os, sys
 from common import Args
 from common import Settings
 from common import Status
-import addons
+import steps
 
 def splash():
     print __doc__.strip()
@@ -41,7 +41,7 @@ class Project(object):
 
         # update all plugins after script runs
         for step in self.steps:
-            addons.update(step[0], step[1], self)
+            steps.update(step[0], step[1], self)
 
         i = 1
         for step in self.steps:
@@ -49,7 +49,7 @@ class Project(object):
             print "%s step (addon: %s)..." % (step_name,  step[1])
             i += 1
             #status = getattr(self, step)()
-            status = addons.step(step[0], step[1], self)
+            status = steps.step(step[0], step[1], self)
             #if status == Status.SUCCESS:
             #    #print("...%s finished." % step_name)
             if status == Status.FAILURE:
@@ -62,7 +62,7 @@ class Project(object):
 
 def detect_project():
 
-    #for addon in addons.base.values():
+    #for addon in steps.base.values():
     #    try:
     #        if addon.Project.compatible():
     #            return addon.Project()
@@ -70,20 +70,20 @@ def detect_project():
     #        pass
 
     project = Project()
-    # Run all detection addons
-    for addon in addons.steps["detect"]:
-        if not addons.step("detect", addon, project):
+    # Run all detection steps
+    for addon in steps.steps["detect"]:
+        if not steps.step("detect", addon, project):
             return None
     # Add required steps to project
-    for addon_type in addons.steps.iterkeys():
+    for addon_type in steps.steps.iterkeys():
         if addon_type == "detect":
             continue
-        for addon in addons.steps[addon_type]:
-            if addons.compatible(addon_type, addon, project):
+        for addon in steps.steps[addon_type]:
+            if steps.compatible(addon_type, addon, project):
                 project.steps += [(addon_type, addon)]
 
     # check if project meets standards for a sgmake project
-    if addons.is_project(project):
+    if steps.is_project(project):
         return project
     
     # otherwise, no project detected
@@ -114,7 +114,7 @@ def main():
     Args.command_aliases = {"?":"help", "ls":"list"}
     Args.process()
 
-    addons.process()
+    steps.process()
 
     if Args.option("version"):
         splash()

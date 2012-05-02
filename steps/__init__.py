@@ -79,8 +79,8 @@ def process_path(path):
         return
     if not os.path.abspath(path) in sys.path:
         sys.path.append(path)
-    #if not os.path.abspath(os.path.join(path,"addons")) in sys.path:
-    #    sys.path.append(os.path.join(path,"addons"))
+    #if not os.path.abspath(os.path.join(path,"steps")) in sys.path:
+    #    sys.path.append(os.path.join(path,"steps"))
 
     for addon_type in steps:
         #if addon_type not in steps:
@@ -121,6 +121,6 @@ def process_path(path):
 
 def process():
     process_path(os.path.dirname(os.path.realpath(__file__)))
-    #process_path(os.path.join(os.environ['HOME'], ".siege", "addons"))
+    #process_path(os.path.join(os.environ['HOME'], ".siege", "steps"))
 
 

@@ -29,8 +29,10 @@ It attempts to solve common tedious tasks involved with programming in a way tha
     - a state machine of custom switches for your project
     - does not require embedding incompatible code like other preprocessors
     - manipulate source code from an external script similar to manipulating DOM
-
-- Vim plugins for each tool
+- SiegeTask (sgtask)
+    - Task-oriented Org-Mode alternative
+    - Source issue tracking
+    - Vim plug-in
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

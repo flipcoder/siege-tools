@@ -3,6 +3,7 @@ import os
 import sgmake
 from common import Status
 from common import Settings
+from common.Plugin import Plugin
 import sign.jarsigner
 
 def make(project):
@@ -103,7 +104,7 @@ def set_defaults(project):
 
 def update(project):
     project.clean += ["%s/%s.jar" % (project.outputdir, project.name) , "%s/**.class" % project.classdir]
-    project.steps = [("clean","clean")] + project.steps
+    project.steps = [Plugin("steps","clean","clean")] + project.steps
 
     # if signing is supported by the user, attempt it automatically
     if sign.jarsigner.user_support():
@@ -112,16 +113,16 @@ def update(project):
         added = False
         i = 0
         for s in project.steps:
-            if s[0] == "obfuscate":
-                project.steps.insert(i+1, ("sign", "jarsigner"))
+            if s.type == "obfuscate":
+                project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
                 added = True
                 break
             i += 1
         i = 0
         if not added:
             for s in project.steps:
-                if s[0] == "make" and s[1] == "javac":
-                    project.steps.insert(i+1, ("sign", "jarsigner"))
+                if s.type == "make" and s.name == "javac":
+                    project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
                     added = True
                     break
                 i += 1

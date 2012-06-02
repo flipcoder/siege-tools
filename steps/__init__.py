@@ -65,13 +65,6 @@ def compatible(group, addon, project):
 def update(group, addon, project):
     return method(group,addon,"update",project,None)
 
-# minimum requirements for a project
-def is_project(project):
-    for step in project.steps:
-        if step[0] in ("make","package"):
-            return True
-    return False
-
 def process_path(path):
     global base
     global steps

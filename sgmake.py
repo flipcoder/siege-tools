@@ -2,7 +2,7 @@
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
-Version 0.4.0
+Version 0.5.0
 Copyright (c) 2012 Grady O'Connell
 """
 
@@ -10,6 +10,7 @@ import os, sys
 from common import Args
 from common import Settings
 from common import Status
+from common.Plugin import Plugin
 import steps
 
 def splash():
@@ -64,22 +65,23 @@ class Project(object):
 
         # update all plugins after script runs
         for step in self.steps:
-            steps.update(step[0], step[1], self)
+            step.call("update", self)
+            #steps.update(step.type(), step.name(), self)
 
         i = 1
         for step in self.steps:
-            step_name = step[0][0].upper() + step[0][1:] # capitalize step name
-            print "%s step (addon: %s)..." % (step_name,  step[1])
+            step_type = step.type[0].upper() + step.type[1:] # capitalize step name
+            print "%s step (addon: %s)..." % (step_type,  step.name)
             i += 1
             #status = getattr(self, step)()
-            status = steps.step(step[0], step[1], self)
+            status = steps.step(step.type, step.name, self)
             #if status == Status.SUCCESS:
             #    #print("...%s finished." % step_name)
             if status == Status.FAILURE:
-                print("...%s failed." % step_name)
+                print("...%s failed." % step_type)
                 return False
             elif status == Status.UNSUPPORTED:
-                print("...%s unsupported." % step_name)
+                print("...%s unsupported." % step_type)
 
         return True
 
@@ -94,24 +96,33 @@ def detect_project():
     #        pass
 
     project = Project()
+
     # Run all detection steps
     for addon in steps.steps["detect"]:
         if not steps.step("detect", addon, project):
             return None
+
     # Add required steps to project
     for addon_type in steps.steps.iterkeys():
         if addon_type == "detect":
             continue
         for addon in steps.steps[addon_type]:
             if steps.compatible(addon_type, addon, project):
-                project.steps += [(addon_type, addon)]
+                project.steps += [Plugin("steps", addon_type, addon)]
 
     # check if project meets standards for a sgmake project
-    if steps.is_project(project):
+    if is_project(project):
         return project
     
     # otherwise, no project detected
     return None
+
+# minimum requirements for a project
+def is_project(project):
+    for step in project.steps:
+        if step.type in ("make","package"):
+            return True
+    return False
 
 def try_project(fn):
 
@@ -133,7 +144,7 @@ def main():
 
     Args.valid_anywhere= ["help"]
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["version", "verbose", "strict", "file", "force"]
+    Args.valid_options = ["version", "verbose", "strict", "force"]#, "interactive", "recursive"
     Args.valid_commands = ["list", "debug"]
     Args.valid_keys = []
     Args.command_aliases = {"?":"help", "ls":"list"}

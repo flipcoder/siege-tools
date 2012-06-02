@@ -2,6 +2,7 @@
 import os
 import sgmake
 from common import Status
+from common import Support
 from common import Settings
 from common.Plugin import Plugin
 import sign.jarsigner
@@ -107,7 +108,7 @@ def update(project):
     project.steps = [Plugin("steps","clean","clean")] + project.steps
 
     # if signing is supported by the user, attempt it automatically
-    if sign.jarsigner.user_support():
+    if sign.jarsigner.compatible() & Support.USER:
         # if project needs to be obfuscated, add signing after that
         #  otherwise add it after compilation (this step)
         added = False
@@ -128,6 +129,7 @@ def update(project):
                 i += 1
 
 def compatible(project):
+    support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     
     # TODO turn this into a detect
     for fn in os.listdir("."):
@@ -135,7 +137,8 @@ def compatible(project):
             if fn.lower().endswith(".mf"):
                 project.manifest = fn    
                 set_defaults(project)
-                return True
+                support |= Support.PROJECT
+                break
 
-    return False
+    return support
 

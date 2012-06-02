@@ -10,6 +10,6 @@ def install(project):
     return Status.SUCCESS
 
 def compatible(project):
-    # only if user supports
-    return False
+    # TODO: check for user support -> return Support.USER
+    return 0
 

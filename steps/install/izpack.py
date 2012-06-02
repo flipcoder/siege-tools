@@ -7,5 +7,5 @@ def install(project):
     return Status.SUCCESS
 
 def compatible(project):
-    return False
+    return 0
 

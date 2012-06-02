@@ -41,26 +41,29 @@ def step(group, addon, project):
     if group in steps and addon in steps[group]:
         try:
             return getattr(steps[group][addon], group)(project)
-        except:
+        except AttributeError:
             pass
     return 0
 
 def method(group, addon, method, project, default):
     try:
         return getattr(steps[group][addon], method)(project)
-    except:
+    except AttributeError:
         pass
     return default
 
 def method2(group, addon, method, project, user, default):
     try:
         return getattr(steps[group][addon], method)(project,user)
-    except:
+    except AttributeError:
         pass
     return default
 
 def compatible(group, addon, project):
-    return method(group,addon,"compatible",project,False)
+    r = method(group,addon,"compatible",project,-1)
+    if r == -1:
+        print "Warning: addon %s had an error." % addon
+    return r
 
 def update(group, addon, project):
     return method(group,addon,"update",project,None)

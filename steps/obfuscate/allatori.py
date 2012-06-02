@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import os
 import sgmake
-from sgmake import Status
+from common import Support
+from common import Status
 from common import Settings
 
 def obfuscate(project):
@@ -15,7 +16,8 @@ def obfuscate(project):
     return Status.SUCCESS
 
 def compatible(project):
+    support = Support.ENVIRONMENT | Support.USER | Support.AUTO # TODO: basic checks for user support before adding this flag
     if os.path.isfile("allatori.xml"):
-        return True
-    return False
+        support |= Support.PROJECT
+    return support
 

@@ -10,6 +10,7 @@ import os, sys
 from common import Args
 from common import Settings
 from common import Status
+from common import Support
 from common.Plugin import Plugin
 import steps
 
@@ -107,7 +108,7 @@ def detect_project():
         if addon_type == "detect":
             continue
         for addon in steps.steps[addon_type]:
-            if steps.compatible(addon_type, addon, project):
+            if steps.compatible(addon_type, addon, project) & Support.MASK == Support.MASK:
                 project.steps += [Plugin("steps", addon_type, addon)]
 
     # check if project meets standards for a sgmake project
@@ -142,12 +143,11 @@ def try_project(fn):
 
 def main():
 
-    Args.valid_anywhere= ["help"]
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["version", "verbose", "strict", "force"]#, "interactive", "recursive"
-    Args.valid_commands = ["list", "debug"]
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "force", "rebuild"]#, "interactive", "recursive"
+    Args.valid_commands = []
     Args.valid_keys = []
-    Args.command_aliases = {"?":"help", "ls":"list"}
+    Args.command_aliases = {} #"?":"help", "ls":"list"}
     Args.process()
 
     steps.process()
@@ -155,7 +155,7 @@ def main():
     if Args.option("version"):
         splash()
         return
-    if Args.anywhere("help") or Args.anywhere("?"):
+    if Args.option("help") or Args.option("?"):
         help()
         return
 
@@ -170,24 +170,24 @@ def main():
         failed_count += 1
 
     # recurse once if no project
-    if r == 0:
-        for fn in os.listdir("."):
-            if fn.startswith("."):
-                continue
-            if not os.path.isdir(os.path.join(wdir, fn)):
-                continue
-            if os.path.islink(os.path.join(wdir, fn)):
-                continue
+    #if r == 0:
+    #    for fn in os.listdir("."):
+    #        if fn.startswith("."):
+    #            continue
+    #        if not os.path.isdir(os.path.join(wdir, fn)):
+    #            continue
+    #        if os.path.islink(os.path.join(wdir, fn)):
+    #            continue
 
-            os.chdir(os.path.join(wdir, fn))
+    #        os.chdir(os.path.join(wdir, fn))
 
-            r = try_project(fn)
-            if r == 1:
-                success_count += 1
-            elif r == -1:
-                failed_count += 1
+    #        r = try_project(fn)
+    #        if r == 1:
+    #            success_count += 1
+    #        elif r == -1:
+    #            failed_count += 1
 
-            os.chdir(wdir)
+    #        os.chdir(wdir)
 
     if not Args.command("list"):
         if failed_count:

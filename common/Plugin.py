@@ -1,6 +1,6 @@
 import importlib
 
-class Plugin:
+class Plugin(object):
     def __init__(self, folder, type, name):
         self.folder = folder
         self.type = type
@@ -15,4 +15,6 @@ class Plugin:
             return getattr(self.lib, method)(*params)
         except:
             pass
+    def __eq__(self, other):
+        return self.folder == other.folder and self.type == other.type and self.name == other.name
 

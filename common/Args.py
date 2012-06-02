@@ -112,12 +112,15 @@ def process():
                     exit(1)
 
         else:
-            # no prefix dashes (-) on argument means its an command/command
-            if arg in valid_commands:
-                commands.append(arg);
-            elif arg in command_aliases and command_aliases[arg] in valid_commands:
-                commands.append(command_aliases[arg])
-            else:
-                print "Invalid command \'%s\'" % arg
-                exit(1)
+            pass
+            # no prefix dashes (-) on argument means its a command or  filename
+
+            # TODO: add back in commands
+            #if arg in valid_commands:
+            #    commands.append(arg);
+            #elif arg in command_aliases and command_aliases[arg] in valid_commands:
+            #    commands.append(command_aliases[arg])
+            #else:
+            #    print "Invalid command \'%s\'" % arg
+            #    exit(1)
 

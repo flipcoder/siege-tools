@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 import os
 import sgmake
-from sgmake import Status
+from common import Support
+from common import Status
 from common import Settings
 
 def sign(project):
@@ -21,10 +22,13 @@ def sign(project):
 
     return Status.SUCCESS
 
-def user_support():
-    return Settings.get("keystore_pass") and Settings.get("keystore_name")
 
 def compatible(project):
     # always deny compatibility, step can be added only by registered by another other addon or user script
-    return False
+    support = Support.PROJECT | Support.ENVIRONMENT
+
+    if(Settings.get("keystore_pass") and Settings.get("keystore_name")):
+        support |= Support.USER
+        
+    return support
 

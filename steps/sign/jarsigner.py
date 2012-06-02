@@ -5,7 +5,7 @@ from sgmake import Status
 from common import Settings
 
 def sign(project):
-    os.system("%sjarsigner -storepass %s %s %s" % (project.javapath, Settings.get("keystore_pass"), project.output, Settings.get("keystore_name")))
+    os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name")))
     
     # sign libs too (TODO: make optional)
     for classpath_dir in project.classpath:
@@ -14,7 +14,7 @@ def sign(project):
                 #if fn.lower().endswith(".%s" % project.bin_ext):
                 if fn.lower().endswith(".jar"):
                     print "Signing %s..." % fn
-                    os.system("%sjarsigner -storepass %s %s %s" % (project.javapath, Settings.get("keystore_pass"), os.path.join(classpath_dir,fn), Settings.get("keystore_name")))
+                    os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath, "jarsigner"), Settings.get("keystore_pass"), os.path.join(classpath_dir,fn), Settings.get("keystore_name")))
                         
         # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         #return Status.FAILURE if Args.option("strict") else Status.UNSUPPORTED
@@ -25,6 +25,6 @@ def user_support():
     return Settings.get("keystore_pass") and Settings.get("keystore_name")
 
 def compatible(project):
-    # always deny compatibility, addon can be added only by other addon
+    # always deny compatibility, step can be added only by registered by another other addon or user script
     return False
 

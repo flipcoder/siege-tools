@@ -60,6 +60,9 @@ def make(project):
 
     project.javapath = Settings.get('java_path')
     if project.javapath:
+        project.javapath = os.path.abspath(project.javapath)
+
+    if project.javapath:
         if project.javapath[-1] != os.sep and os.altsep and Settings.get('java_path')[-1] != os.altsep:
             project.javapath += os.sep
     else:
@@ -70,8 +73,8 @@ def make(project):
     # TODO: boostrap class path
     # removed: -source 1.6 -target 1.6 
     misc_params = " ".join(project.javac_params)
-    os.system("%sjavac %s -d %s %s -cp %s" % (project.javapath, misc_params, project.classdir, sourcepath, classpath))
-    os.system("%sjar cmf %s %s -C %s ." % (project.javapath, project.manifest, project.output, project.classdir))
+    os.system("%s %s -d %s %s -cp %s" % (os.path.join(project.javapath,"javac"), project.javapath, misc_params, project.classdir, sourcepath, classpath))
+    os.system("%s cmf %s %s -C %s ." % (os.path.join(project.javapath,"jar"), project.javapath, project.manifest, project.output, project.classdir))
     # TODO wrap stdout from above commands and detect errors
     
     if not os.path.isfile(project.output):

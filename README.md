@@ -30,9 +30,13 @@ It attempts to solve common tedious tasks involved with programming in a way tha
     - does not require embedding incompatible code like other preprocessors
     - manipulate source code from an external script similar to manipulating DOM
 - SiegeTask (sgtask)
-    - Task-oriented Org-Mode alternative
+    - Basic Task-oriented Org-Mode alternative
     - Source issue tracking
-    - Vim plug-in
+    - Possible Vim plugin
+- SiegeTap (sgtap)
+    - Alternative to Unix "touch"
+    - Context-based file templates
+        Example: when you're in a folder with .cpp files, making a new .h file uses a C++ header template instead of C
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

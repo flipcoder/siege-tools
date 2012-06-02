@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python2
 """
 Siege-Tools SiegeTask (\"sgtask\")
 CLI Task Planning

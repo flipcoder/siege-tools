@@ -8,10 +8,10 @@ def obfuscate(project):
     obf_path = Settings.get("allatori_path")
     if not obf_path:
         return Status.UNSUPPORTED
-    obf_path = os.path.abspath(obf_path)
+    obf_path = os.path.abspath(os.path.expanduser(obf_path))
     if not os.path.isfile(obf_path):
         return Status.FAILURE
-    os.system(project.javapath + "java -jar %s allatori.xml" % obf_path)
+    os.system("%s -jar %s allatori.xml" % (os.path.join(project.javapath, "java"), obf_path))
     return Status.SUCCESS
 
 def compatible(project):

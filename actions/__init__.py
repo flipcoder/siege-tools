@@ -5,11 +5,11 @@ import importlib
 
 base = {}
 #steps = {}
-plugins = collections.OrderedDict([
+steps = collections.OrderedDict([
     ("detect", {}),
     ("clean", {}),
     ("preprocess", {}),
-    #("resolve", {}),
+    ("resolver", {}),
     ("make", {}),
     ("obfuscate", {}),
     ("doc", {}),
@@ -17,10 +17,9 @@ plugins = collections.OrderedDict([
     ("package", {}),
     ("install", {}),
     ("test", {}),
-    ("deploy", {})
-    #("notify", {})
+    ("deploy", {}),
+    ("notify", {})
 ])
-steps = plugins
 #step_names = (
 #    "detect",
 #    "clean",

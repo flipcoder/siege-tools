@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python2
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Build System Wrapper
@@ -23,20 +23,43 @@ def help():
     print()
     commands()
 
+def confirm(question, default="y"):
+    default = default.lower()
+    if default=="y":
+        options="Y/n"
+    else:
+        options="y/N"
+    # TODO: make this a single character read (no endline)
+    choice = raw_input("%s (%s)? " % (question, options))
+    choice = choice.lower()
+    if choice == "":
+        choice = default
+    return choice=="y"
+
 class Project(object):
 
     def __init__(self):
         self.status = Status.UNSET
         self.steps = []
 
+    def run_user_config(self, config):
+        for fn in os.listdir("."):
+            if (fn.lower()==config or fn.lower().endswith(".%s" % config)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
+                # move config options into self.__dict__
+                pass
+    
     def run_user_script(self, script):
         ## Project config
         for fn in os.listdir("."):
             if (fn.lower()==script or fn.lower().endswith(".%s" % script)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                with open(fn) as source:
-                    eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
+                if Args.option("force") or confirm("Run potentially insecure python script \"sg.py\"", "y"):
+                    with open(fn) as source:
+                        eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
+                else:
+                    sys.exit(1)
     
     def complete(self):
+        self.run_user_config("sg.ini")
         self.run_user_script("sg.py")
 
         # update all plugins after script runs
@@ -53,6 +76,7 @@ class Project(object):
             #if status == Status.SUCCESS:
             #    #print("...%s finished." % step_name)
             if status == Status.FAILURE:
+                print("...%s failed." % step_name)
                 return False
             elif status == Status.UNSUPPORTED:
                 print("...%s unsupported." % step_name)
@@ -108,7 +132,8 @@ def try_project(fn):
 def main():
 
     Args.valid_anywhere= ["help"]
-    Args.valid_options = ["version", "verbose", "strict"]
+    # option "interactive" is a placeholder and doesn't do anything yet
+    Args.valid_options = ["version", "verbose", "strict", "file", "force"]
     Args.valid_commands = ["list", "debug"]
     Args.valid_keys = []
     Args.command_aliases = {"?":"help", "ls":"list"}

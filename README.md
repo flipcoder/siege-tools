@@ -35,7 +35,7 @@ It attempts to solve common tedious tasks involved with programming in a way tha
     - Possible Vim plugin
 - SiegeTap (sgtap)
     - Alternative to Unix "touch"
-    - Context-based file templates
+    - Context-aware file templates
         Example: when you're in a folder with .cpp files, making a new .h file uses a C++ header template instead of C
 
 ## Contributing ##

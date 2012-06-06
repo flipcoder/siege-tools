@@ -15,6 +15,7 @@ valid_keys = []
 valid_commands = []
 valid_anywhere = []
 command_aliases = {}
+filenames = []
 allow_strings = False
 
 def option(s):
@@ -40,10 +41,12 @@ def anywhere(s):
 def process():
     global valid_commands
     global valid_options
+    global filenames
     valid_commands = valid_anywhere + valid_commands
     valid_options = valid_anywhere + valid_options
 
     for arg in sys.argv[1:]:
+        arg_case = arg
         arg = arg.lower()
         if arg.startswith("--"):
             if '=' in arg:
@@ -112,7 +115,7 @@ def process():
                     exit(1)
 
         else:
-            pass
+            filenames += [arg_case]
             # no prefix dashes (-) on argument means its a command or  filename
 
             # TODO: add back in commands

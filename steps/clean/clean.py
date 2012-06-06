@@ -7,18 +7,21 @@ from common import Support
 from common import Args
 
 def clean(project):
-    # TODO Clean files and folders listed in project.clean
-    #  Should obey wildcards (*) and recursive wildcards (**)
+    for cmd in project.clean_commands:
+        try:
+            os.system(cmd)
+        except:
+            pass
 
-    try:
-        for cmd in project.clean_commands:
-            try:
-                os.system(cmd)
-            except:
-                pass
-    except:
-        pass
+    for path in project.clean_paths:
+        print "Removing %s..." % path
+        os.remove(path)
+
     return Status.SUCCESS
+
+def update(project):
+    project.clean_paths = []
+    project.clean_commands = []
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.PROJECT # no auto

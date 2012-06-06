@@ -1,19 +1,24 @@
-The subdirectories represent a step in the build process.
-They have different behavior and may be called in a different
-order depending on the project, user config, and step status.
-Some steps are optional, also depending on the factors above.
+Each subdirectory represents a type of step in a projects' build process.
+Each step is a plug-in and needs to have a compatible() method to
+test whether or not the step can be automatically added and under
+what circumstances based on the project, the environment, and the user's
+settings.
+
+The following are a list of the build step types in which plug-ins can be written
+to carry out:
 
 detect
     begin the process by detecting the project settings and deciding
     on the steps available to the user. Multiple detectors can be used
     on a given project
+    TODO: eventually we need to differentiate between detections that are
+        run only when it is certain the directory contains a project and those that
+        are run on all directories, for speed concerns.
 clean
     Deals with removal of past project binaries and clearing
     output directories
 preprocess
     Calls sgmod and/or external preprocessors
-resolver
-    Attempts to resolve dependencies based on the current environment
 make
     The central last minute configuration, compilation, and building
 obfuscate
@@ -26,12 +31,11 @@ sign
 package
     generate packages or installers
 install
-    automatic installation of packages on a local machine
+    installation of packages on a local machine
 test
     a placeholder for unit tests that need to be part of the build process
 deploy
-    any project-specific code for uploading or sending files
-    to a particular destination
-notify
-    a user or project reserved step to notify when a build process has finished
+    any code for uploading or sending files to a particular destination
+    this can be requested by the user for all built projects to be deployed
+    to a sync directory like dropbox or ftp
 

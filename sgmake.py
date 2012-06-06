@@ -1,14 +1,13 @@
 #!/usr/bin/python2
 """
 Siege-Tools SiegeMake (\"sgmake\")
-Multi-Language Build System Wrapper
+Multi-Language Extensible Build Automation
 Version 0.5.0
 Copyright (c) 2012 Grady O'Connell
 """
 
 import os, sys
 from common import Args
-from common import Settings
 from common import Status
 from common import Support
 from common.Plugin import Plugin
@@ -54,7 +53,7 @@ class Project(object):
         ## Project config
         for fn in os.listdir("."):
             if (fn.lower()==script or fn.lower().endswith(".%s" % script)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                if Args.option("force") or confirm("Run potentially insecure python script \"sg.py\"", "y"):
+                if Args.option("force") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
                     with open(fn) as source:
                         eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
                 else:
@@ -75,7 +74,8 @@ class Project(object):
             print "%s step (addon: %s)..." % (step_type,  step.name)
             i += 1
             #status = getattr(self, step)()
-            status = steps.step(step.type, step.name, self)
+            status = step.call(step.type, self) # example: install plugins call install() method
+            #status = steps.step(step.type, step.name, self)
             #if status == Status.SUCCESS:
             #    #print("...%s finished." % step_name)
             if status == Status.FAILURE:
@@ -100,16 +100,19 @@ def detect_project():
 
     # Run all detection steps
     for addon in steps.steps["detect"]:
-        if not steps.step("detect", addon, project):
+        if not Plugin("steps", "detect", addon).call("detect",project):
             return None
+        #if not steps.step("detect", addon, project):
 
     # Add required steps to project
     for addon_type in steps.steps.iterkeys():
         if addon_type == "detect":
             continue
         for addon in steps.steps[addon_type]:
-            if steps.compatible(addon_type, addon, project) & Support.MASK == Support.MASK:
-                project.steps += [Plugin("steps", addon_type, addon)]
+            #if steps.compatible(addon_type, addon, project) & Support.MASK == Support.MASK:
+            plugin = Plugin("steps", addon_type, addon)
+            if plugin.call("compatible", project) == Support.MASK:
+                project.steps += [plugin]
 
     # check if project meets standards for a sgmake project
     if is_project(project):
@@ -125,18 +128,35 @@ def is_project(project):
             return True
     return False
 
-def try_project(fn):
+def try_project(fn, root):
+
+    wdir = os.getcwd()
+
+    if fn.startswith(".") and fn != ".": # check if path is hidden
+        return 0
+    if not os.path.isdir(os.path.join(wdir, fn)):
+        return 0
+    if os.path.islink(os.path.join(wdir, fn)):
+        return 0
+
+    os.chdir(os.path.join(wdir, fn))
 
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
-        print "[%s]" % project.name
+        project_path = os.path.relpath(os.getcwd(), root)
+        if project_path == project.name:
+            print "%s" % (project.name)
+        else:
+            print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), root))
 
     # only list details on list command
     if Args.command("list"):
+        os.chdir(wdir)
         return 0
 
     if project and not project.status == Status.UNSUPPORTED:
+        os.chdir(wdir)
         return 1 if project.complete() else -1
 
     return 0
@@ -144,10 +164,7 @@ def try_project(fn):
 def main():
 
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "force", "rebuild"]#, "interactive", "recursive"
-    Args.valid_commands = []
-    Args.valid_keys = []
-    Args.command_aliases = {} #"?":"help", "ls":"list"}
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "force", "rebuild", "recursive"]#, "interactive", "recursive"
     Args.process()
 
     steps.process()
@@ -159,15 +176,19 @@ def main():
         help()
         return
 
-    wdir = os.getcwd()
     success_count = 0
     failed_count = 0
+    root_path = os.getcwd()
 
-    r = try_project(".")
-    if r == 1:
-        success_count += 1
-    elif r == -1:
-        failed_count += 1
+    if not Args.filenames:
+        Args.filenames = ["."]
+
+    for fn in Args.filenames:
+        r = try_project(fn, root_path)
+        if r == 1:
+            success_count += 1
+        elif r == -1:
+            failed_count += 1
 
     # recurse once if no project
     #if r == 0:

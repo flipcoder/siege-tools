@@ -37,36 +37,36 @@ steps = plugins
 #    "notify"
 #)
 
-def step(group, addon, project):
-    if group in steps and addon in steps[group]:
-        try:
-            return getattr(steps[group][addon], group)(project)
-        except AttributeError:
-            pass
-    return 0
+#def step(group, addon, project):
+#    if group in steps and addon in steps[group]:
+#        try:
+#            return getattr(steps[group][addon], group)(project)
+#        except AttributeError:
+#            pass
+#    return 0
 
-def method(group, addon, method, project, default):
-    try:
-        return getattr(steps[group][addon], method)(project)
-    except AttributeError:
-        pass
-    return default
+#def method(group, addon, method, project, default):
+#    try:
+#        return getattr(steps[group][addon], method)(project)
+#    except AttributeError:
+#        pass
+#    return default
 
-def method2(group, addon, method, project, user, default):
-    try:
-        return getattr(steps[group][addon], method)(project,user)
-    except AttributeError:
-        pass
-    return default
+#def method2(group, addon, method, project, user, default):
+#    try:
+#        return getattr(steps[group][addon], method)(project,user)
+#    except AttributeError:
+#        pass
+#    return default
 
-def compatible(group, addon, project):
-    r = method(group,addon,"compatible",project,-1)
-    if r == -1:
-        print "Warning: addon %s had an error." % addon
-    return r
+#def compatible(group, addon, project):
+#    r = method(group,addon,"compatible",project,-1)
+#    if r == -1:
+#        print "Warning: addon %s had an error." % addon
+#    return r
 
-def update(group, addon, project):
-    return method(group,addon,"update",project,None)
+#def update(group, addon, project):
+#    return method(group,addon,"update",project,None)
 
 def process_path(path):
     global base
@@ -96,25 +96,6 @@ def process_path(path):
                 continue
             #steps[addon_type][name] = __import__(addon_type, globals(), locals(), [name], -1)
             steps[addon_type][name] = importlib.import_module("%s.%s" % (addon_type, name))
-
-    #for fn in os.listdir(path):
-    #    if fn.lower().endswith(".py") and not fn.lower() == "__init__.py":
-    #        name = fn[:-3]
-    #        base[name] = __import__(name, globals(), locals(), [], -1)
-    #        #if hasattr(base[fn],"category"): # TODO addon categories
-    #    elif os.path.isdir(os.path.join(path,fn)):
-    #        addon_type = fn.lower()
-    #        if addon_type not in steps:
-    #            steps[addon_type] = {}
-    #        for step_addon in os.listdir(os.path.join(path,fn)):
-    #            name = step_addon.lower()
-    #            if name.endswith(".pyc"):
-    #                continue
-    #            if name == "__init__.py":
-    #                continue
-    #            if name.endswith(".py"):
-    #                name = step_addon[:-3]
-    #            steps[addon_type][name] = __import__("%s.%s" % (fn, name), globals(), locals(), [], -1)
 
 def process():
     process_path(os.path.dirname(os.path.realpath(__file__)))

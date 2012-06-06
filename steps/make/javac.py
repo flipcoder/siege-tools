@@ -9,7 +9,7 @@ import sign.jarsigner
 
 def make(project):
 
-    for folder in (project.classdir,project.outputdir):
+    for folder in (project.classdir,project.output_path):
         try:
             os.mkdir(os.path.join(os.getcwd(), folder))
         except OSError:
@@ -72,7 +72,7 @@ def make(project):
     #else:
     #    project.javapath = ""
 
-    project.output = project.outputdir+os.sep+project.name+".jar"
+    project.output = project.output_path+os.sep+project.name+".jar"
 
     # TODO: boostrap class path
     # removed: -source 1.6 -target 1.6 
@@ -94,7 +94,11 @@ def set_defaults(project):
     project.output = None
     # TODO: "classes" might be output dir, do that in local detect check
     project.classdir = "bin"
-    project.outputdir = "dist"
+    try:
+        project.output_path
+    except:
+        project.output_path = "dist"
+
     project.language = "java"
     project.src_ext = ["java"]
     # TODO if no manifest, auto-generate (?)
@@ -106,29 +110,28 @@ def set_defaults(project):
     project.clean = []
 
 def update(project):
-    project.clean += ["%s/%s.jar" % (project.outputdir, project.name) , "%s/**.class" % project.classdir]
+    project.clean += ["%s/%s.jar" % (project.output_path, project.name) , "%s/**.class" % project.classdir]
     project.steps = [Plugin("steps","clean","clean")] + project.steps
 
+    added = False
+
     # if signing is supported by the user, attempt it automatically
-    if sign.jarsigner.compatible() & Support.USER:
+    if sign.jarsigner.compatible(project) & Support.USER:
         # if project needs to be obfuscated, add signing after that
         #  otherwise add it after compilation (this step)
-        added = False
         i = 0
         for s in project.steps:
             if s.type == "obfuscate":
                 project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
                 added = True
-                break
             i += 1
+
         i = 0
         if not added:
-            for s in project.steps:
-                if s.type == "make" and s.name == "javac":
-                    project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
-                    added = True
-                    break
-                i += 1
+            if s.type == "make" and s.name == "javac":
+                project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
+                added = True
+            i += 1
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO

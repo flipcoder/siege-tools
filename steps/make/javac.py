@@ -72,7 +72,7 @@ def make(project):
     #else:
     #    project.javapath = ""
 
-    project.output = project.output_path+os.sep+project.name+".jar"
+    project.output = os.path.join(project.output_path,project.name+".jar")
 
     # TODO: boostrap class path
     # removed: -source 1.6 -target 1.6 

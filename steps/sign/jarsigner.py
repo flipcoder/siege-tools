@@ -6,6 +6,7 @@ from common import Status
 from common import Settings
 
 def sign(project):
+    print "Signing %s..." % project.output
     os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name")))
     
     # sign libs too (TODO: make optional)

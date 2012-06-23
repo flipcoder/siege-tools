@@ -138,7 +138,7 @@ def compatible(project):
     
     # TODO turn this into a detect
     for fn in os.listdir("."):
-        if os.path.isfile(fn):
+        if os.path.isfile(os.path.join(os.getcwd(),fn)):
             if fn.lower().endswith(".mf"):
                 project.manifest = fn    
                 set_defaults(project)

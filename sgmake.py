@@ -53,7 +53,7 @@ class Project(object):
         ## Project config
         for fn in os.listdir("."):
             if (fn.lower()==script or fn.lower().endswith(".%s" % script)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                if Args.option("force") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
+                if not Args.option("warn") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
                     with open(fn) as source:
                         eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
                 else:
@@ -144,11 +144,7 @@ def try_project(fn, root):
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
-        project_path = os.path.relpath(os.getcwd(), root)
-        if project_path == project.name:
-            print "%s" % (project.name)
-        else:
-            print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), root))
+        print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), root))
 
     # only list details on list command
     if Args.command("list"):
@@ -159,12 +155,13 @@ def try_project(fn, root):
         os.chdir(wdir)
         return 1 if project.complete() else -1
 
+    os.chdir(wdir)
     return 0
 
 def main():
 
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "force", "rebuild", "recursive"]#, "interactive", "recursive"
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "rebuild", "recursive"]#, "interactive", "recursive"
     Args.process()
 
     steps.process()

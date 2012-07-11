@@ -128,7 +128,7 @@ def is_project(project):
             return True
     return False
 
-def try_project(fn, root):
+def try_project(fn):
 
     wdir = os.getcwd()
 
@@ -140,14 +140,13 @@ def try_project(fn, root):
         return 0
 
     os.chdir(os.path.join(wdir, fn))
-
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
-        print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), root))
+        print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), wdir))
 
     # only list details on list command
-    if Args.command("list"):
+    if Args.anywhere("list"):
         os.chdir(wdir)
         return 0
 
@@ -172,16 +171,15 @@ def main():
     if Args.option("help") or Args.option("?"):
         help()
         return
-
+    
     success_count = 0
     failed_count = 0
-    root_path = os.getcwd()
 
     if not Args.filenames:
         Args.filenames = ["."]
 
     for fn in Args.filenames:
-        r = try_project(fn, root_path)
+        r = try_project(fn)
         if r == 1:
             success_count += 1
         elif r == -1:

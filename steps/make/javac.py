@@ -137,10 +137,10 @@ def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     
     # TODO turn this into a detect
-    for fn in os.listdir("."):
+    for fn in os.listdir(os.getcwd()):
         if os.path.isfile(os.path.join(os.getcwd(),fn)):
             if fn.lower().endswith(".mf"):
-                project.manifest = fn    
+                project.manifest = os.path.join(os.getcwd(), fn)
                 set_defaults(project)
                 support |= Support.PROJECT
                 break

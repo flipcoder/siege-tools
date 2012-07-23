@@ -28,7 +28,6 @@ def compatible(project):
         if os.path.isfile(os.path.join(os.getcwd(),fn)):
             if fn.lower().endswith(".nsi"):
                 project.nsi_file = fn
-                print project.nsi_file
                 support |= Support.PROJECT
 
     return support

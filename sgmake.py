@@ -132,25 +132,26 @@ def try_project(fn):
 
     wdir = os.getcwd()
 
-    if fn.startswith(".") and fn != ".": # check if path is hidden
+    if fn.startswith(".") and fn != "." and fn != "..": # check if path is hidden
         return 0
-    if not os.path.isdir(os.path.join(wdir, fn)):
+    if not os.path.isdir(fn):
         return 0
-    if os.path.islink(os.path.join(wdir, fn)):
+    if os.path.islink(fn):
         return 0
 
-    os.chdir(os.path.join(wdir,fn))
+    os.chdir(fn)
     project = detect_project()
 
+    listed = False
     if project and not project.status == Status.UNSUPPORTED:
         print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), wdir))
+        listed = True
 
-    # only list details on list command
     if Args.anywhere("list"):
         os.chdir(wdir)
-        return 0
+        return 1 if listed else 0
 
-    if project and not project.status == Status.UNSUPPORTED:
+    if listed:
         if project.complete():
             os.chdir(wdir)
             return 1
@@ -161,8 +162,8 @@ def try_project(fn):
     os.chdir(wdir)
     return 0
 
-def main():
 
+def main():
     # option "interactive" is a placeholder and doesn't do anything yet
     Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive"] #, "interactive"
     Args.process()
@@ -182,12 +183,41 @@ def main():
     if not Args.filenames:
         Args.filenames = ["."]
 
-    for fn in Args.filenames:
-        r = try_project(fn)
-        if r == 1:
-            success_count += 1
-        elif r == -1:
-            failed_count += 1
+    recursive = Args.option("recursive")
+    reversive = Args.option("reversive")
+
+    if recursive:
+        # TODO this recursion sucks, fix it later
+        for fn in Args.filenames:
+            if fn.startswith(".") and fn != "." and fn != "..":
+                continue
+            r = 0
+            for root, dirs, files in os.walk(fn):
+                stop_recurse = False
+                for d in dirs:
+                    base =  os.path.basename(os.path.join(root,d))
+                    if base.startswith(".") and base != ".":
+                        continue
+
+                    #print os.path.normpath(os.path.join(root,d))
+                    r = try_project(os.path.normpath(os.path.join(root, d)))
+                    if r == 1:
+                        success_count += 1
+                        stop_recurse = True
+                    elif r == -1:
+                        failed_count += 1
+                if stop_recurse:
+                    dirs[:] = []
+                
+    elif reversive:
+        pass
+    else:
+        for fn in Args.filenames:
+            r = try_project(os.path.join(os.getcwd(),fn))
+            if r == 1:
+                success_count += 1
+            elif r == -1:
+                failed_count += 1
 
     # recurse once if no project
     #if r == 0:

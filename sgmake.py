@@ -139,7 +139,7 @@ def try_project(fn):
     if os.path.islink(os.path.join(wdir, fn)):
         return 0
 
-    os.chdir(os.path.join(wdir, fn))
+    os.chdir(os.path.join(wdir,fn))
     project = detect_project()
 
     if project and not project.status == Status.UNSUPPORTED:
@@ -151,8 +151,12 @@ def try_project(fn):
         return 0
 
     if project and not project.status == Status.UNSUPPORTED:
-        os.chdir(wdir)
-        return 1 if project.complete() else -1
+        if project.complete():
+            os.chdir(wdir)
+            return 1
+        else:
+            os.chdir(wdir)
+            return -1
 
     os.chdir(wdir)
     return 0
@@ -160,7 +164,7 @@ def try_project(fn):
 def main():
 
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "rebuild", "recursive"]#, "interactive", "recursive"
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive"] #, "interactive"
     Args.process()
 
     steps.process()

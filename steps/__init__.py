@@ -21,6 +21,7 @@ plugins = collections.OrderedDict([
     #("notify", {})
 ])
 steps = plugins
+ignore_steps = []
 #step_names = (
 #    "detect",
 #    "clean",
@@ -71,6 +72,7 @@ steps = plugins
 def process_path(path):
     global base
     global steps
+    global ignore_steps
 
     if not os.path.exists(path):
         return
@@ -80,9 +82,16 @@ def process_path(path):
     #    sys.path.append(os.path.join(path,"steps"))
 
     for addon_type in steps:
+        # addons can still be imported by other plugins even with this check, so plugins are still required to check .ignored(step) before adding
+        if addon_type in ignore_steps:
+            continue
+
         #if addon_type not in steps:
         #    steps[addon_type] = {}
         for step_addon in os.listdir(os.path.join(path,addon_type)):
+            if step_addon in ignore_steps:
+                continue
+
             name = step_addon
             if not name.islower():
                 continue
@@ -99,6 +108,12 @@ def process_path(path):
 
 def process():
     process_path(os.path.dirname(os.path.realpath(__file__)))
-    #process_path(os.path.join(os.environ['HOME'], ".siege", "steps"))
 
+def ignore(step_names):
+    global ignore_steps
+    ignore_steps += step_names
 
+def ignored(step):
+    if step in ignored_steps:
+        return True
+    return False

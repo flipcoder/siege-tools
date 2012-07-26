@@ -41,6 +41,7 @@ def anywhere(s):
 def process():
     global valid_commands
     global valid_options
+    global valid_keys
     global filenames
     valid_commands = valid_anywhere + valid_commands
     valid_options = valid_anywhere + valid_options
@@ -59,8 +60,8 @@ def process():
                     exit(1)
                     #break
                     
-                if key not in valid_map:
-                    print "Invalid parameter \'%s\'" % arg
+                if key not in valid_keys:
+                    print "Invalid key \'%s\'" % key
                     exit(1)
 
                 if key not in arg_map:

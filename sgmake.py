@@ -88,6 +88,9 @@ class Project(object):
 
 
 def detect_project():
+    """
+    Detects the projects build steps and checks for step support
+    """
 
     #for addon in steps.base.values():
     #    try:
@@ -123,22 +126,31 @@ def detect_project():
 
 # minimum requirements for a project
 def is_project(project):
+    """
+    Checks if a project meets the minimum step standards
+    """
     for step in project.steps:
-        if step.type in ("make","package"):
+        if step.type in ("make","package"): # at least one make or package step
             return True
     return False
 
-def try_project(fn):
 
+def try_project(fn):
+    """
+    Calls necessary detection methods on a potential project path
+    Parameter is an os.path
+    """
+    # save previous dir so we can pop back into it
     wdir = os.getcwd()
 
     if fn.startswith(".") and fn != "." and fn != "..": # check if path is hidden
         return 0
-    if not os.path.isdir(fn):
+    if not os.path.isdir(os.path.join(fn)):
         return 0
     if os.path.islink(fn):
         return 0
 
+    # push new dir
     os.chdir(fn)
     project = detect_project()
 
@@ -166,8 +178,14 @@ def try_project(fn):
 def main():
     # option "interactive" is a placeholder and doesn't do anything yet
     Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive"] #, "interactive"
+    Args.valid_keys = ["ignore"]
     Args.process()
 
+    # process the build step plugins
+    try:
+        steps.ignore(Args.value("ignore").split(",")) # disable requested steps
+    except AttributeError:
+        pass
     steps.process()
 
     if Args.option("version"):
@@ -177,17 +195,21 @@ def main():
         help()
         return
     
+    # count of projects succeeded and failed
     success_count = 0
     failed_count = 0
 
+    # if no project filenames are specified, we'll use the current directory (".")
     if not Args.filenames:
         Args.filenames = ["."]
 
+    # check for forward recusion and backward scan settings
     recursive = Args.option("recursive")
     reversive = Args.option("reversive")
 
     if recursive:
         # TODO this recursion sucks, fix it later
+        # recurse through directories until you find project(s)
         for fn in Args.filenames:
             if fn.startswith(".") and fn != "." and fn != "..":
                 continue
@@ -202,16 +224,21 @@ def main():
                     #print os.path.normpath(os.path.join(root,d))
                     r = try_project(os.path.normpath(os.path.join(root, d)))
                     if r == 1:
-                        success_count += 1
+                        if not Args.option("list"):
+                            success_count += 1
                         stop_recurse = True
                     elif r == -1:
-                        failed_count += 1
+                        if not Args.option("list"):
+                            failed_count += 1
                 if stop_recurse:
                     dirs[:] = []
                 
     elif reversive:
+        # TODO search for project by iterating dirs backwards
+        # To be used build a sgmake project from within a nested directory or source editor
         pass
     else:
+        # try to build projects specified by the user, current dir is default
         for fn in Args.filenames:
             r = try_project(os.path.join(os.getcwd(),fn))
             if r == 1:
@@ -219,27 +246,9 @@ def main():
             elif r == -1:
                 failed_count += 1
 
-    # recurse once if no project
-    #if r == 0:
-    #    for fn in os.listdir("."):
-    #        if fn.startswith("."):
-    #            continue
-    #        if not os.path.isdir(os.path.join(wdir, fn)):
-    #            continue
-    #        if os.path.islink(os.path.join(wdir, fn)):
-    #            continue
-
-    #        os.chdir(os.path.join(wdir, fn))
-
-    #        r = try_project(fn)
-    #        if r == 1:
-    #            success_count += 1
-    #        elif r == -1:
-    #            failed_count += 1
-
-    #        os.chdir(wdir)
 
     if not Args.command("list"):
+        # if not in list-only mode, display final status of built projects
         if failed_count:
             print("%s project(s) failed." % failed_count)
         elif success_count:

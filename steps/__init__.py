@@ -114,6 +114,8 @@ def ignore(step_names):
     ignore_steps += step_names
 
 def ignored(step):
-    if step in ignored_steps:
+    global ignore_steps
+    if step in ignore_steps:
         return True
     return False
+

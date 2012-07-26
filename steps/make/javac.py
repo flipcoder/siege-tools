@@ -5,6 +5,7 @@ from common import Status
 from common import Support
 from common import Settings
 from common.Plugin import Plugin
+import steps
 import sign.jarsigner
 
 def make(project):
@@ -116,7 +117,7 @@ def update(project):
     added = False
 
     # if signing is supported by the user, attempt it automatically
-    if sign.jarsigner.compatible(project) & Support.USER and not ignored("sign"):
+    if sign.jarsigner.compatible(project) & Support.USER and not steps.ignored("sign"):
         # if project needs to be obfuscated, add signing after that
         #  otherwise add it after compilation (this step)
         i = 0

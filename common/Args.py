@@ -47,8 +47,8 @@ def process():
     valid_options = valid_anywhere + valid_options
 
     for arg in sys.argv[1:]:
-        arg_case = arg
-        arg = arg.lower()
+        #arg_case = arg
+        #arg = arg.lower()
         if arg.startswith("--"):
             if '=' in arg:
                 idx = arg.find("=")
@@ -66,14 +66,14 @@ def process():
 
                 if key not in arg_map:
                     arg_map[key] = value
-                #options.append(key)
             else:
                 entry = arg[2:]
                 if entry not in valid_options:
                     print "Invalid parameter \'%s\'" % entry
                     exit(1)
-                if entry not in options:
+                elif entry not in options:
                     options.append(entry)
+
         elif arg.startswith("-"):
         #    arg = arg[1:]
         #    if arg in valid_options:
@@ -98,19 +98,24 @@ def process():
             for ch in letters:
                 matched_arg = False
                 num_matches = 0
+
                 for name in valid_options:
                     if ch == name[:1]:
-                        if name not in options:
-                            options.append(name)
-                        matched_arg = True
+                        if num_matches == 0:
+                            matched_arg = True
+                            if name not in options:
+                                options.append(name)
+                            break
                     elif ch == name[:1].upper():
                         # uses secondary match if the letter is capitalized
                         # example: -v matches version, -V matches verbose
-                        if num_matches > 1: 
-                            options.append(name)
-                            matched_arg
+                        if num_matches > 0: 
+                            matched_arg = True
+                            if name not in options:
+                                options.append(name)
+                            break
                         num_matches += 1
-                        
+
                 if not matched_arg:
                     print "Invalid parameter \'-%s\'" % ch
                     exit(1)

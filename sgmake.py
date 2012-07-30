@@ -236,7 +236,23 @@ def main():
     elif reversive:
         # TODO search for project by iterating dirs backwards
         # To be used build a sgmake project from within a nested directory or source editor
-        pass
+
+        for fn in Args.filenames:
+            path = os.path.abspath(os.path.join(os.getcwd(), fn))
+            while os.path.realpath(path) != os.path.realpath(os.path.join(path, "..")): # is root
+
+                r = try_project(os.path.normpath(path))
+                if r == 1:
+                    if not Args.option("list"):
+                        success_count += 1
+                    break
+                elif r == -1:
+                    if not Args.option("list"):
+                        failed_count += 1
+                    break
+
+                path = os.path.realpath(os.path.join(path, ".."))
+            print "done: %s" % path
     else:
         # try to build projects specified by the user, current dir is default
         for fn in Args.filenames:

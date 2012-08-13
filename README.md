@@ -32,7 +32,7 @@ There's no installer right now, so simply alias using your shell to call the sgm
 This is the best bet so you can keep the git repo current as I change things.
 Example:
 
-alias sgmake="~/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
+alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
 
 To detect and build a sgmake project do:
 

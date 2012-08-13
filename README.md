@@ -31,34 +31,40 @@ This example assumes you're using Linux, Mac should work similarly.
 There's no installer right now, so simply alias using your shell to call the sgmake.py file when you type "sgmake",
 This is the best bet so you can keep the git repo current as I change things.
 Example:
+
 alias sgmake="~/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
 
 To detect and build a sgmake project do:
+
 sgmake
 
 To build a batch of sgmake projects recursively:
+
 sgmake -r
 
 To build a project from a nested directory inside a project (such as in a src/ folder:
+
 sgmake -R
 
 To list the projects detected in a directory
+
 sgmake -l
 
 To list projects recursively:
+
 sgmake -lr
 
 ## What is Supported ##
 
-Automatic cleaning commands based on the build system detected.  Each plug-in may require seperate packages installed to work.
-Premake4-based projects
-Source-only Java projects with manifest files
-Make-based projects (minimal support right now)
-Allatori obfuscation
-Java Jar Signing
-IZPack installer packaging
-NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
-Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
+- Automatic cleaning commands based on the build system detected.  Each plug-in may require seperate packages installed to work.
+- Premake4-based projects
+- Source-only Java projects with manifest files
+- Make-based projects (minimal support right now)
+- Allatori obfuscation
+- Java Jar Signing
+- IZPack installer packaging
+- NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
+- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
 
 ## Vim Integration ##
 

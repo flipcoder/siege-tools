@@ -121,7 +121,7 @@ def process():
                     exit(1)
 
         else:
-            filenames += [arg_case]
+            filenames += [arg]
             # no prefix dashes (-) on argument means its a command or  filename
 
             # TODO: add back in commands

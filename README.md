@@ -32,27 +32,27 @@ There's no installer right now, so simply alias using your shell to call the sgm
 This is the best bet so you can keep the git repo current as I change things.
 Example:
 
-alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
+    alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
 
 To detect and build a sgmake project do:
 
-sgmake
+    sgmake
 
 To build a batch of sgmake projects recursively:
 
-sgmake -r
+    sgmake -r
 
 To build a project from a nested directory inside a project (such as in a src/ folder:
 
-sgmake -R
+    sgmake -R
 
 To list the projects detected in a directory
 
-sgmake -l
+    sgmake -l
 
 To list projects recursively:
 
-sgmake -lr
+    sgmake -lr
 
 ## What is Supported ##
 
@@ -70,9 +70,9 @@ sgmake -lr
 
 In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
 
-nnoremap <leader>s :!/usr/bin/env python2 ~/bin/siege-tools/sgmake.py -R %:p:h<cr>
+    nnoremap <leader>s :!/usr/bin/env python2 ~/bin/siege-tools/sgmake.py -R %:p:h<cr>
 
-When <leader>s is pressed, sgmake does a backwards scan (-R option) for projects starting from the file you're editing, assuming you're probably editing in either the project or a nested source dir, and then runs the build on the first project it detects using the build system detected.
+When leader+s is pressed, sgmake does a backwards scan (-R option) for projects starting from the file you're editing, assuming you're probably editing in either the project or a nested source dir, and then runs the build on the first project it detects using the build system detected.
 
 Eventually, I'll have sgmake send the line numbers of errors back into Vim so you can edit them when builds fail (this is what the "action" plug-ins are for, responses to events)
 

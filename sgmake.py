@@ -177,7 +177,7 @@ def try_project(fn):
 
 def main():
     # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive"] #, "interactive"
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive"
     Args.valid_keys = ["ignore"]
     Args.process()
 
@@ -206,6 +206,7 @@ def main():
     # check for forward recusion and backward scan settings
     recursive = Args.option("recursive")
     reversive = Args.option("reversive")
+    execute = Args.option("x") or Args.option("execute")
 
     if recursive:
         # TODO this recursion sucks, fix it later

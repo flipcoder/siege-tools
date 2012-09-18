@@ -176,8 +176,7 @@ def try_project(fn):
 
 
 def main():
-    # option "interactive" is a placeholder and doesn't do anything yet
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive"
+    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive", "cache"
     Args.valid_keys = ["ignore"]
     Args.process()
 

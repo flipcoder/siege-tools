@@ -19,11 +19,13 @@ Opening files after creation (works even if they exist already)
     sgtap -o file.txt
 """
 
-import os, sys
+import os
+import sys
+from common import *
 from common import Args
 
 def splash():
-    print __doc__.strip()
+    print __doc__.replace("sgtap",program_name()).strip()
 
 def commands():
     print("Options: %s" % ", ".join(Args.valid_options))
@@ -43,8 +45,8 @@ class Project:
         self.global_args = global_args
 
         # get defaults or custom (user-provided) separator and switch chars
-        sep_list = [global_args.value("separator-char")] if global_args.value("separator-char") else ['@', ':', ';'];
-        switch_list = [global_args.value("switch-char")] if global_args.value("switch-char") else ['+'];
+        sep_list = [global_args.value("separator-char")] if global_args.value("separator-char") else ['@', ':', ';']
+        switch_list = [global_args.value("switch-char")] if global_args.value("switch-char") else ['+']
 
         # filename/type separators
         tokens = None # scope
@@ -109,6 +111,10 @@ class Project:
         self.template_path = None
         if not self.fn:
             raise IOError("Must provide a filename.")
+
+        t = Template.fromType(self.type)
+        if not t:
+            raise IOError("No template matching '%s'" % self.type)
         #if not self.type:
         #    pass # normal file?
         # TODO template not found error
@@ -116,14 +122,16 @@ class Project:
         # TODO warnings when extensions mismatch with plug-in suggested extensions
 
 def error(e):
-    print >> sys.stderr, "tap: %s" % e
-    print >> sys.stderr, "Try 'tap --help' for more information."
+    print >> sys.stderr, "%s: %s" % (program_name(), e)
+    print >> sys.stderr, "Try '%s --help' for more information." % program_name()
 
 def main():
     # interactive lets you check each flag for the plug-in while projects are being built
-    Args.valid_options = ["help", "interactive", "warn", "verbose", "open", "replace", "remove", "force", "list"]
-    Args.valid_keys = ["separator-char", "switch-char", "type-default", "switch-default"] # --ignore=context
+    Args.valid_options = ["?", "help", "interactive", "warn", "verbose", "open", "replace", "remove", "force", "list"]
+    Args.valid_keys = ["separator-char", "switch-char", "type-default", "switch-default", "title"] # --ignore=context
     Args.process()
+
+    set_program_name(Args.value("title"))
 
     if Args.option("help") or Args.option("?"):
         help()
@@ -132,7 +140,7 @@ def main():
     # check for bad options (not yet implemented)
     for bad in ("interactive", "warn", "open", "replace", "remove", "force"):
         if Args.option(bad):
-            error("option '%s' is not yet implemented" % bad)
+            error("option '%s' not yet implemented" % bad)
             return
     
     # loop through provided filenames
@@ -146,7 +154,7 @@ def main():
             #    return
             # if t:
     else:
-        error("tap: missing file operand")
+        error("missing file operand" % program_name())
         return
 
 if __name__=="__main__":

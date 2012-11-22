@@ -65,7 +65,7 @@ To list projects recursively:
 - Java Jar Signing
 - IZPack installer packaging
 - NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
-- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.=
+- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
 
 ## Vim Integration ##
 

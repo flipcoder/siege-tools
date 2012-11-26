@@ -7,6 +7,7 @@ base = {}
 #steps = {}
 plugins = collections.OrderedDict([
     ("detect", {}),
+    ("analyze", {}),
     ("clean", {}),
     ("preprocess", {}),
     #("resolve", {}),

@@ -19,7 +19,7 @@ def update(project):
     else:
         project.qmakepath = ""
 
-    make_step = Plugin("steps", "make", "make")
+    make_step = Plugin("steps", "make", "makefile")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
     clean_step = Plugin("steps", "clean", "clean")
     if make_step in project.steps:

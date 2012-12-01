@@ -1,4 +1,4 @@
-# siege-tools
+# siege-tools #
 http://github.com/flipcoder/siege-tools
 
 Copyright &copy; 2012 Grady O'Connell
@@ -11,24 +11,40 @@ See LICENSE for more information
 Siege Tools is a work-in-progress collection of cross-platform CLI developer tools designed to bring more IDE-like functionality back to the command line.
 It attempts to solve common tedious tasks involved with programming in a way that works with multiple platforms and languages.
 
-Currently, the only tool ready for use is the build system wrapper, SiegeMake (sgmake).
+Currently, the only tool ready for use is SiegeMake (sgmake).
 
 ## Components ##
 
-- SiegeMake (sgmake)
-    - cross-platform
-    - multi-language plug-in support
-    - a wrapper around some current systems (make, premake, etc.)
-    - an automatic build system detector and autoconfigurer
-    - supports more advanced build steps such as obfuscation and digital signing
-    - basic Vim integration (see below)
-    - a cross-platform dependency resolver (eventually)
+###sgmake (SiegeMake)###
 
-## Basic Usage ##
+sgmake is a build system auto-detector / wrapper.  It's job is to select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.  Build systems can chose to add other steps needed as they're detected, and/or reorder them as needed.  If no build system is found, it can look at the filetypes and even analyze the source files to see if the project can still be built.
 
-This example assumes you're using Linux, Mac should work similarly.
+Detector plug-ins run first, and provide information about each project to the other plug-ins, such as the count and percentages of certain filetypes, and other clues about the project environment.
 
-There's no installer right now, so simply alias using your shell to call the sgmake.py file when you type "sgmake",
+Each step of the build process has its own set of plug-ins.  The plug-in types are detect, analyze, clean, preprocess, make, obfuscate, doc, sign, package, install, test, and deploy.
+Look below at the feature list to see a list of the plug-ins supported.
+
+Since sgmake is still a work-in-progress, "Action" plug-ins are not yet implemented.  Actions are what allows sgmake to send information from within the build process back to the calling environment.
+An example of this would be if a user runs sgmake from within Vim, the build process can send back errors back or trigger custom notification plug-ins, such as launching a debugger.  These events happen only if the environment supports them, such as OS-specific pop-up notifications), much like the build plug-ins.
+
+#### What is Supported ####
+
+- Automatic cleaning and rebuild
+- Premake projects
+- Source-only Java projects with manifest files
+- Make-based projects (minimal support right now)
+- Qt qmake
+- Allatori obfuscation
+- Java Jar Signing
+- IZPack installer packaging
+- NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
+- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
+
+#### Basic Usage ####
+
+This example assumes you're using Linux, but MacOS should work similarly.
+
+There's no installer right now, so simply create an alias using your shell to call the sgmake.py file when you type "sgmake",
 This is the best bet so you can keep the git repo current as I change things.
 Example:
 
@@ -54,20 +70,7 @@ To list projects recursively:
 
     sgmake -lr
 
-## What is Supported ##
-
-- Automatic cleaning commands based on the build system detected.  Each plug-in may require seperate packages installed to work.
-- Premake4-based projects
-- Source-only Java projects with manifest files
-- Make-based projects (minimal support right now)
-- Qt qmake support
-- Allatori obfuscation
-- Java Jar Signing
-- IZPack installer packaging
-- NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
-- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
-
-## Vim Integration ##
+#### Vim Integration ####
 
 In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
 

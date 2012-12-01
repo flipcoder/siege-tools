@@ -90,7 +90,6 @@ def make(project):
 def set_defaults(project):
     if not project.sourcepath:
         project.sourcepath = ["src"]
-    project.classpath = ["lib","libs"]
     project.obfuscator = None
     project.output = None
     # TODO: "classes" might be output dir, do that in local detect check
@@ -99,6 +98,7 @@ def set_defaults(project):
         project.output_path
     except:
         project.output_path = "dist"
+    project.classpath = ["lib","libs"]
 
     project.language = "java"
     project.src_ext = ["java"]

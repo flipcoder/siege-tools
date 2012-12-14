@@ -9,7 +9,8 @@ from common.Plugin import Plugin
 import clean.clean
 
 def make(project):
-    os.system("% -o Makefile %s" % (os.path.join(project.qmakepath, "qmake"), project.qmake_pro_file))
+    os.system(os.path.join(project.qmakepath, "qmake"))
+    #os.system("% -o Makefile %s" % (os.path.join(project.qmakepath, "qmake"), project.qmake_pro_file))
     return Status.SUCCESS
 
 def update(project):

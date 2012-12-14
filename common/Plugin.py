@@ -1,4 +1,5 @@
 import importlib
+import sys
 
 class Plugin(object):
     def __init__(self, folder, type, name):
@@ -11,10 +12,19 @@ class Plugin(object):
     def len(self):
         return len(self.name)
     def call(self, method, *params):
+        attr = None
         try:
-            return getattr(self.lib, method)(*params)
+            attr = getattr(self.lib, method)
         except:
-            pass
+            #print "Invalid attr: %s(%s)" % (self.lib,method)
+            return
+
+        try:
+            return attr(*params)
+        except:
+            print "plug-in method %s(%s) threw exception" % (self.lib, method)
+            print sys.exc_info()
+
     def __eq__(self, other):
         return self.folder == other.folder and self.type == other.type and self.name == other.name
 

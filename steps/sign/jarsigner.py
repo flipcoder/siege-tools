@@ -9,6 +9,20 @@ def unsign(project):
     pass
 
 def sign(project):
+    try:
+        project.signjars
+    except:
+        project.signjars = []
+
+    try:
+        project.output
+    except:
+        print "Nothing to sign."
+        return
+    if not project.output:
+        print "Nothing to sign."
+        return
+
     print "Signing %s..." % project.output
     os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name")))
     print "%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name"))

@@ -127,12 +127,14 @@ def update(project):
                 added = True
             i += 1
 
-        i = 0
         if not added:
-            if s.type == "make" and s.name == "javac":
-                project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
-                added = True
-            i += 1
+            i = 0
+            for s in project.steps:
+                if s.type == "make" and s.name == "javac":
+                    project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
+                    added = True
+                i += 1
+              
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO

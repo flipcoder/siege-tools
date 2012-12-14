@@ -7,20 +7,29 @@ from common import Support
 from common import Args
 
 def clean(project):
+    # if added from another plug-in update may not be called
+    # TODO: this is hackish fix, but it'll do for now
+    try:
+        project.clean_commands
+    except:
+        project.clean_commands = []
+
     for cmd in project.clean_commands:
         try:
             os.system(cmd)
         except:
             pass
 
-    for path in project.clean_paths:
-        print "Removing %s..." % path
-        os.remove(path)
+    # TODO: parse wildcards and recursive wildcards
+
+    #for path in project.clean:
+    #    print "Removing %s..." % path
+    #    os.remove(path)
 
     return Status.SUCCESS
 
 def update(project):
-    project.clean_paths = []
+    project.clean = []
     project.clean_commands = []
 
 def compatible(project):

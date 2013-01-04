@@ -14,9 +14,19 @@ def make(project):
     elif os.path.isfile("premake.lua"):
         premake = "premake"
 
-    premake_platform = "gmake"
+    try:
+        project.premake_platform
+    except:
+        project.premake_platform = "gmake"
 
-    os.system("%s %s" % (os.path.join(project.makepath, premake), premake_platform))
+    premake_platform_param = ""
+    try:
+        if project.premake_platform:
+            premake_platform_param = "--platform=%s" % project.platform_param
+    except:
+        pass
+
+    os.system("%s %s %s" % (os.path.join(project.makepath, premake), project.premake_platform, premake_platform_param))
     return Status.SUCCESS
 
 def update(project):

@@ -11,7 +11,20 @@ def make(project):
     except:
         project.makepath = ""
 
-    os.system(os.path.join(project.makepath,"make"))
+    try:
+        project.makefile_params
+    except:
+        project.makefile_params = ""
+
+    # example makefile params (add in project sg file):
+        # makefile_params="CXX=\'clang++\'"
+        # makefile_params="CXX=\'gccfilter -c -a g++\'"
+
+    os.system("%s%s" %
+        (os.path.join(project.makepath,"make"),
+            " %s" % project.makefile_params
+        )
+    )
     return Status.SUCCESS
 
 def compatible(project):

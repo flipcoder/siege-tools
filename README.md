@@ -86,22 +86,17 @@ Eventually, I'll have sgmake send the line numbers of errors back into Vim so yo
 - Better installer
 - Better vim integration
 
+- SiegeTap (sgtap)
+    - Alternative to Unix "touch" but with basic project templates
+    - Generating template projects to use with sgmake or your build system of choice
+    - Context-aware file and project templates and generators
+
 - SiegeMod (sgmod)
     - a multi-language, extensible preprocessor
     - compatible with sgmake (above)
     - a state machine of custom switches for your project
     - does not require embedding incompatible code like other preprocessors
     - manipulate source code from an external script similar to manipulating DOM
-
-- SiegeTap (sgtap)
-    - Alternative to Unix "touch"
-    - Generating template projects to use with sgmake or your build system of choice
-    - Context-aware file and project templates and generators
-
-- SiegeTask (sgtask) (eventually)
-    - Basic Task-oriented Org-Mode alternative
-    - Automatic Source issue tracking
-    - Possible Vim plugin
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sgmake
+import subprocess
 from common import Status
 from common import Settings
 from common import Support
@@ -20,11 +21,22 @@ def make(project):
         # makefile_params="CXX=\'clang++\'"
         # makefile_params="CXX=\'gccfilter -c -a g++\'"
 
-    os.system("%s%s" %
-        (os.path.join(project.makepath,"make"),
-            " %s" % project.makefile_params
-        )
-    )
+    cmdline = [os.path.join(project.makepath,"make")]
+    if project.makefile_params:
+        cmdline += [project.makefile_params]
+
+    #print " ".join(cmdline)
+
+    try:
+        subprocess.check_call(cmdline)
+    except subprocess.CalledProcessError:
+        return Status.FAILURE
+
+    #os.system("%s%s" %
+    #    (os.path.join(project.makepath,"make"),
+    #        " %s" % project.makefile_params
+    #    )
+    #)
     return Status.SUCCESS
 
 def compatible(project):

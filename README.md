@@ -50,6 +50,17 @@ Example:
 
     alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
 
+Or, make a new file /usr/bin/sgmake, with contents:
+
+    #!/bin/bash
+    /usr/bin/env/python2 ~/bin/siege-tools/sgmake.py "$@"
+
+(Use your own path to siege-tools)
+
+Then, give it execute permissions:
+
+    sudo chmod +x /usr/bin/sgmake
+
 To detect and build a sgmake project do:
 
     sgmake
@@ -72,13 +83,30 @@ To list projects recursively:
 
 #### Vim Integration ####
 
+# Setting sgmake as vim's "makeprg"
+
+Add this to .vimrc
+
+    let makeprg=sgmake\ -R
+
+Then, to build a project from a file inside a project dir, just type in vim;
+
+    :make
+
+And to bring up the quicklist, type:
+
+    :copen
+
+Eventually, siege-tools event plug-ins will allow you to jump into vim from the
+command at the context of the first error.  I haven't written this part yet though. :)
+
+# Calling from Vim (alternative to above)
+
 In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
 
     nnoremap <leader>s :!/usr/bin/env python2 ~/bin/siege-tools/sgmake.py -R %:p:h<cr>
 
 When leader+s is pressed, sgmake does a backwards scan (-R option) for projects starting from the file you're editing, assuming you're probably editing in either the project or a nested source dir, and then runs the build on the first project it detects using the build system detected.
-
-Eventually, I'll have sgmake send the line numbers of errors back into Vim so you can edit them when builds fail (this is what the "action" plug-ins are for, responses to events)
 
 ## Future ##
 

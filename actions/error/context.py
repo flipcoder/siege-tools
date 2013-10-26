@@ -9,3 +9,7 @@ It is enabled based on a combination of:
     what editor the user has set to their default in sgrc
 """
 
+
+# TODO: if event plug-in enabled by user's environment settings,
+# do check if $EDITOR == vim,  vim -c make! -c cwindow (?)
+

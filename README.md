@@ -83,7 +83,7 @@ To list projects recursively:
 
 #### Vim Integration ####
 
-# Setting sgmake as vim's "makeprg"
+##### Setting sgmake as vim's "makeprg" #####
 
 Add this to .vimrc
 
@@ -100,7 +100,7 @@ And to bring up the quicklist, type:
 Eventually, siege-tools event plug-ins will allow you to jump into vim from the
 command at the context of the first error.  I haven't written this part yet though. :)
 
-# Calling from Vim (alternative to above)
+##### Calling from Vim (alternative to above) #####
 
 In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
 

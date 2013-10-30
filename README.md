@@ -34,6 +34,8 @@ An example of this would be if a user runs sgmake from within Vim, the build pro
 - Source-only Java projects with manifest files
 - Make-based projects (minimal support right now)
 - Qt qmake
+- Node.js npm install
+- Grunt (Javascript Task Runner)
 - Allatori obfuscation
 - Java Jar Signing
 - IZPack installer packaging

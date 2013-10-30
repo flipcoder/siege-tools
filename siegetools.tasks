@@ -1,0 +1,3 @@
+* sgmake
+    [ ] sgmake -R freezes at root (/) when no projects are hit
+    [ ] sgmake -R should stop when hitting dir without write permissions

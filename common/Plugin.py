@@ -24,6 +24,7 @@ class Plugin(object):
         except:
             print "plug-in method %s(%s) threw exception" % (self.lib, method)
             print sys.exc_info()
+            return Status.FAILURE
 
     def __eq__(self, other):
         return self.folder == other.folder and self.type == other.type and self.name == other.name

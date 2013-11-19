@@ -1,6 +1,7 @@
 import os
 import platform
 import sgmake
+import subprocess
 from common import Status
 from common import Settings
 from common import Support
@@ -9,9 +10,22 @@ def package(project):
     wine = False if platform.system() == "Windows" else True
 
     if wine:
-        os.system("wine \"c:/Program Files (x86)/NSIS/makensis.exe\" %s" % project.nsi_file)
+        try:
+            subprocess.check_call(["makensis", project.nsi_file])
+        except OSError:
+            try:
+                subprocess.check_call(["wine",  "\"c:/Program Files (x86)/NSIS/makensis.exe\"", project.nsi_file])
+            except OSError:
+                return Status.UNSUPPORTED
+            #except subprocess.CalledProcessError:
+            #    return Status.FAILURE
+        #except subprocess.CalledProcessError:
+        #    return Status.FAILURE
     else:
-        os.system("makensis %s" % project.nsi_file)
+        try:
+            subprocess.check_call(["makensis", project.nsi_file])
+        except OSError:
+            return Status.UNSUPPORTED
 
     return Status.SUCCESS
 

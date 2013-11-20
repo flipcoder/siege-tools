@@ -1,5 +1,6 @@
 import importlib
 import sys
+from common import Status
 
 class Plugin(object):
     def __init__(self, folder, type, name):

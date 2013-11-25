@@ -77,21 +77,37 @@ class Project(object):
             #status = getattr(self, step)()
             status = step.call(step.type, self) # example: install plugins call install() method
             #status = steps.step(step.type, step.name, self)
-            #if status == Status.SUCCESS:
+            if status == Status.SUCCESS:
+                self.event("status", "step_success")
             #    #print("...%s finished." % step_name)
-            if status == Status.FAILURE:
+            elif status == Status.FAILURE:
                 print("...%s failed." % step_type)
+                self.event("status", "step_failure")
                 return False
             elif status == Status.UNSUPPORTED:
+                self.event("status", "step_unsupported")
                 print("...%s unsupported." % step_type)
 
         return True
 
-    def event(event, args):
+    def event(self, name, args):
         r = []
-        for e in self.events[event]:
-            r += e.call(event, args)
+        try:
+            for e in self.events[name]:
+                r += e.call(name, self, args)
+        except TypeError:
+            pass
         return r
+
+def event(addon_type, args):
+    r = []
+    try:
+        for addon in events.events[addon_type]:
+            e = Plugin("events", addon_type, addon)
+            r += e.call(addon_type, None, args)
+    except TypeError:
+        pass
+    return r
 
 def detect_project():
     """
@@ -280,11 +296,16 @@ def main():
 
     if not Args.command("list"):
         # if not in list-only mode, display final status of built projects
+        
+        if success_count:
+            print("%s project(s) completed." % success_count)
+            if not failed_count:
+                event("status", "success")
         if failed_count:
             print("%s project(s) failed." % failed_count)
-        elif success_count:
-            print("%s project(s) completed." % success_count)
-        else:
+            event("status", "failure")
+        elif not success_count and not failed_count:
+            event("status", "nothing")
             print("Nothing to be done.")
 
 

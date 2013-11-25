@@ -1,9 +1,12 @@
 #!/usr/bin/env python2
-import pyglet
+from common import Status
+from common import Settings
+from common import Support
 
-def status(project):
+def status(project, args):
+    # Play <args>.wav!
     pass
 
 def compatible(project):
-    pass
+    return Support.MASK
 

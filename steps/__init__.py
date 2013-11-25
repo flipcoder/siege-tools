@@ -105,7 +105,11 @@ def process_path(path):
             elif not path.isdir(name):
                 continue
             #steps[addon_type][name] = __import__(addon_type, globals(), locals(), [name], -1)
-            steps[addon_type][name] = importlib.import_module("%s.%s" % (addon_type, name))
+            try:
+                steps[addon_type][name] = importlib.import_module("%s.%s" % (addon_type, name))
+            except ImportError:
+                #print e
+                print >> sys.stderr, "Missing dependency for addon \'%s\'" % name
 
 def process():
     process_path(os.path.dirname(os.path.realpath(__file__)))

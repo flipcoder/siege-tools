@@ -40,7 +40,7 @@ An example of this would be if a user runs sgmake from within Vim, the build pro
 - Java Jar Signing
 - IZPack installer packaging
 - NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
-- Take a look in the steps/ and actions/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
+- Take a look in the steps/ and events/ folder to see some progress on new plug-ins I've started.  Some of these are currently disabled.
 
 #### Basic Usage ####
 

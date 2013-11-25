@@ -2,8 +2,8 @@
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Multi-Language Extensible Build Automation
-Version 0.6.0
-Copyright (c) 2012 Grady O'Connell
+Version 0.7.0
+Copyright (c) 2013 Grady O'Connell
 """
 
 import os, sys
@@ -12,6 +12,7 @@ from common import Status
 from common import Support
 from common.Plugin import Plugin
 import steps
+import events
 
 def splash():
     print __doc__.strip()
@@ -86,6 +87,11 @@ class Project(object):
 
         return True
 
+    def event(event, args):
+        r = []
+        for e in self.events[event]:
+            r += e.call(event, args)
+        return r
 
 def detect_project():
     """
@@ -116,6 +122,14 @@ def detect_project():
             plugin = Plugin("steps", addon_type, addon)
             if plugin.call("compatible", project) == Support.MASK:
                 project.steps += [plugin]
+        
+    project.events = {}
+    for addon_type in events.events.iterkeys():
+        project.events[addon_type] = []
+        for addon in events.events[addon_type]:
+            plugin = Plugin("events", addon_type, addon)
+            if plugin.call("compatible", project) == Support.MASK:
+                project.events[addon_type] += [plugin]
 
     # check if project meets standards for a sgmake project
     if is_project(project):
@@ -186,6 +200,7 @@ def main():
     except AttributeError:
         pass
     steps.process()
+    events.process()
 
     if Args.option("version"):
         splash()

@@ -31,6 +31,7 @@ An example of this would be if a user runs sgmake from within Vim, the build pro
 
 - Automatic cleaning and rebuild
 - Premake projects
+- CMake projects
 - Source-only Java projects with manifest files
 - Make-based projects (minimal support right now)
 - Qt qmake

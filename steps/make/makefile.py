@@ -25,12 +25,26 @@ def make(project):
     if project.makefile_params:
         cmdline += [project.makefile_params]
 
-    #print " ".join(cmdline)
-
+    try:
+        os.chdir(project.build_dir)
+    except:
+        pass
+    
     try:
         subprocess.check_call(cmdline)
     except subprocess.CalledProcessError:
+        try:
+            if project.build_dir:
+                os.chdir("..")
+        except:
+            pass
         return Status.FAILURE
+    
+    try:
+        if project.build_dir:
+            os.chdir("..")
+    except:
+        pass
 
     #os.system("%s%s" %
     #    (os.path.join(project.makepath,"make"),

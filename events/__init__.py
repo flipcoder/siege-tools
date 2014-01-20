@@ -83,7 +83,7 @@ def process_path(path):
                 continue
             if name.endswith(".py"):
                 name = event_addon[:-3]
-            elif not path.isdir(name):
+            elif not os.path.isdir(name):
                 continue
             #events[addon_type][name] = __import__(addon_type, globals(), locals(), [name], -1)
             try:

@@ -35,7 +35,7 @@ def update(project):
 def compatible(project):
     support = Support.ENVIRONMENT | Support.PROJECT # no auto
 
-    if Args.option("rebuild"):
+    if Args.option("clean"):
         support |= Support.USER
 
     return support

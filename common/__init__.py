@@ -21,6 +21,9 @@ def program_name():
     else:
         return _program_name
 
+def enforce_order(steps, order):
+    pass
+
 class Status:
     UNSET=0
     SUCCESS=1

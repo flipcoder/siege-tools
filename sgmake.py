@@ -70,6 +70,7 @@ class Project(object):
             #steps.update(step.type(), step.name(), self)
 
         i = 1
+        self.event("status", "step_start")
         for step in self.steps:
             step_type = step.type[0].upper() + step.type[1:] # capitalize step name
             print "%s step (addon: %s)..." % (step_type,  step.name)
@@ -237,6 +238,8 @@ def main():
     recursive = Args.option("recursive")
     reversive = Args.option("reversive")
     execute = Args.option("x") or Args.option("execute")
+            
+    event("status", "start")
 
     if recursive:
         # TODO this recursion sucks, fix it later

@@ -12,17 +12,23 @@ def make(project):
     except:
         project.dockerpath = ""
     
-    try:
-        project.sudocmd = os.path.abspath(os.path.expanduser(Settings.get('sudo_command')))
-    except:
-        project.sudo_command = "sudo"
+    #try:
+    #    project.sudocmd = os.path.abspath(os.path.expanduser(Settings.get('sudo_command')))
+    #except:
+    #    project.sudo_command = "sudo"
 
     cmdline = [os.path.join(project.dockerpath,"docker"), "build", "."]
 
-    # TODO: only do this next block if current user is not root
-    print "Docker needs root permissions (C-c to cancel)"
-    cmdline = [project.sudo_command] + cmdline
-    project.event("status", "preauth")
+    #try:
+    #    subprocess.check_call(os.path.join(project.dockerpath,"docker"), stdout=None, stderr=None)
+    #except subprocess.CalledProcessError:
+    #    pass
+
+    # TODO: only do this next block if current user is not part of docker group
+    #  or is not root 
+    #print "Docker needs root permissions (C-c to cancel)"
+    #cmdline = [project.sudo_command] + cmdline
+    #project.event("status", "preauth")
     
     try:
         subprocess.check_call(cmdline)

@@ -73,7 +73,7 @@ class Project(object):
         self.event("status", "step_start")
         for step in self.steps:
             step_type = step.type[0].upper() + step.type[1:] # capitalize step name
-            print "%s step (addon: %s)..." % (step_type,  step.name)
+            print "%s step (plug-in: %s)..." % (step_type,  step.name)
             i += 1
             #status = getattr(self, step)()
             status = step.call(step.type, self) # example: install plugins call install() method
@@ -100,12 +100,12 @@ class Project(object):
             pass
         return r
 
-def event(addon_type, args):
+def event(plugin_type, args):
     r = []
     try:
-        for addon in events.events[addon_type]:
-            e = Plugin("events", addon_type, addon)
-            r += e.call(addon_type, None, args)
+        for plugin in events.events[plugin_type]:
+            e = Plugin("events", plugin_type, plugin)
+            r += e.call(plugin_type, None, args)
     except TypeError:
         pass
     return r
@@ -115,38 +115,38 @@ def detect_project():
     Detects the projects build steps and checks for step support
     """
 
-    #for addon in steps.base.values():
+    #for plugin in steps.base.values():
     #    try:
-    #        if addon.Project.compatible():
-    #            return addon.Project()
+    #        if plugin.Project.compatible():
+    #            return plugin.Project()
     #    except:
     #        pass
 
     project = Project()
 
     # Run all detection steps
-    for addon in steps.steps["detect"]:
-        if not Plugin("steps", "detect", addon).call("detect",project):
+    for plugin in steps.steps["detect"]:
+        if not Plugin("steps", "detect", plugin).call("detect",project):
             return None
-        #if not steps.step("detect", addon, project):
+        #if not steps.step("detect", plugin, project):
 
     # Add required steps to project
-    for addon_type in steps.steps.iterkeys():
-        if addon_type == "detect":
+    for plugin_type in steps.steps.iterkeys():
+        if plugin_type == "detect":
             continue
-        for addon in steps.steps[addon_type]:
-            #if steps.compatible(addon_type, addon, project) & Support.MASK == Support.MASK:
-            plugin = Plugin("steps", addon_type, addon)
+        for plugin in steps.steps[plugin_type]:
+            #if steps.compatible(plugin_type, plugin, project) & Support.MASK == Support.MASK:
+            plugin = Plugin("steps", plugin_type, plugin)
             if plugin.call("compatible", project) == Support.MASK:
                 project.steps += [plugin]
         
     project.events = {}
-    for addon_type in events.events.iterkeys():
-        project.events[addon_type] = []
-        for addon in events.events[addon_type]:
-            plugin = Plugin("events", addon_type, addon)
+    for plugin_type in events.events.iterkeys():
+        project.events[plugin_type] = []
+        for plugin in events.events[plugin_type]:
+            plugin = Plugin("events", plugin_type, plugin)
             if plugin.call("compatible", project) == Support.MASK:
-                project.events[addon_type] += [plugin]
+                project.events[plugin_type] += [plugin]
 
     # check if project meets standards for a sgmake project
     if is_project(project):

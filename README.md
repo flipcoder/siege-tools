@@ -36,6 +36,7 @@ An example of this would be if a user runs sgmake from within Vim, the build pro
 - Make-based projects (minimal support right now)
 - Qt qmake
 - Node.js npm install
+- Docker support
 - Grunt (Javascript Task Runner)
 - Allatori obfuscation
 - Java Jar Signing

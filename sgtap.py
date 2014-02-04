@@ -7,16 +7,16 @@ Version 0.2.0
 Copyright (c) 2012 Grady O'Connell
 
 File and project creation:
-    sgtap myfile -> makes blank file called "cpp" since its name doesnt have extension
+    sgtap myfile -> makes blank file called "myfile" since its name doesnt have extension
     sgtap file.cpp -> makes file "file.cpp" according to .cpp filetype and context (blank if no template found)
-    sgtap blah@make -> makes a project of type "make" named "blah" (plug-in doesn't need extension)
+    sgtap blah@make -> makes a makefile project "blah" (plug-in doesn't need extension)
     sgtap blah.h -> makes c OR c++ header file (plug-in will look for cpp or c files for context hints)
     sgtap blah@java -> makes a java project named "blah"
     sgtap blah@cpp -> make a C++ project named "blah"
-    sgtap blah@cpp+git+premake -> make C++ project, git repository, and premake build script named "blah" ('+' symbol indicates switch)
+    sgtap blah@cpp.git.premake -> c++ git project w/ premake build system
 
 Opening files after creation (works even if they exist already)
-    sgtap -o file.txt
+    sgtap -e file.txt
 """
 
 import os
@@ -35,6 +35,13 @@ def help():
     splash()
     print
     commands()
+
+class Template(object):
+    def __init__(self, fn):
+        pass
+    @staticmethod
+    def from_type(fn):
+        pass
 
 class Project:
     def __init__(self, fn, global_args):
@@ -80,7 +87,7 @@ class Project:
                 tokens = self.type.split(switch)
                 if len(tokens) > 1:
                     self.type = tokens[0]
-                    self.switches = tokens[1:]
+                    #self.switches = tokens[1:]
                     break # correct switch char found
 
         # check if filename and template exist (if so, "touch" (update date of) the file)
@@ -112,7 +119,7 @@ class Project:
         if not self.fn:
             raise IOError("Must provide a filename.")
 
-        t = Template.fromType(self.type)
+        t = Template.from_type(self.type)
         if not t:
             raise IOError("No template matching '%s'" % self.type)
         #if not self.type:
@@ -127,7 +134,7 @@ def error(e):
 
 def main():
     # interactive lets you check each flag for the plug-in while projects are being built
-    Args.valid_options = ["?", "help", "interactive", "warn", "verbose", "open", "replace", "remove", "force", "list"]
+    Args.valid_options = ["?", "help", "interactive", "warn", "verbose", "edit", "replace", "remove", "force", "list"]
     Args.valid_keys = ["separator-char", "switch-char", "type-default", "switch-default", "title"] # --ignore=context
     Args.process()
 

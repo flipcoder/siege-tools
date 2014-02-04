@@ -8,7 +8,11 @@ import time
 inited = False
 
 def status(project, args):
-    import pygame
+    try:
+        import pygame
+    except:
+        return
+    
     global inited
     
     snd_path = "%s/sounds/%s.wav" % (os.path.split(__file__)[0], args)

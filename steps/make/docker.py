@@ -17,7 +17,14 @@ def make(project):
     #except:
     #    project.sudo_command = "sudo"
 
-    cmdline = [os.path.join(project.dockerpath,"docker"), "build", "."]
+    cmdline = [
+        os.path.join(project.dockerpath,"docker"),
+        "-D=true",
+        "build",
+        "-no-cache",
+        "-t=%s"%project.name,
+        ".",
+    ]
 
     #try:
     #    subprocess.check_call(os.path.join(project.dockerpath,"docker"), stdout=None, stderr=None)

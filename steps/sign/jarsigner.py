@@ -22,10 +22,19 @@ def sign(project):
     if not project.output:
         print "Nothing to sign."
         return
+    
+    timestamp_flags = "-tsa http://tsa.starfieldtech.com"
 
     print "Signing %s..." % project.output
-    os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name")))
-    print "%s -storepass %s %s %s" % (os.path.join(project.javapath,"jarsigner"), Settings.get("keystore_pass"), project.output, Settings.get("keystore_name"))
+    cmd = "%s -storepass %s %s %s %s" % (
+        os.path.join(project.javapath,"jarsigner"),
+        Settings.get("keystore_pass"),
+        timestamp_flags,
+        project.output,
+        Settings.get("keystore_name")
+    )
+    print cmd
+    os.system(cmd)
 
     # sign libs too (TODO: make optional)
     for signjars in project.signjars:
@@ -35,9 +44,15 @@ def sign(project):
                 #if fn.lower().endswith(".%s" % project.bin_ext):
                 if fn.lower().endswith(".jar"):
                     #print "Signing %s..." % fn
-                    os.system("%s -storepass %s %s %s" % (os.path.join(project.javapath, "jarsigner"), Settings.get("keystore_pass"), os.path.join(signjars,fn), Settings.get("keystore_name")))
-                    print "%s -storepass %s %s %s" % (os.path.join(project.javapath, "jarsigner"), Settings.get("keystore_pass"), os.path.join(signjars,fn), Settings.get("keystore_name"))
-                        
+                    cmd = "%s -storepass %s %s %s %s" % (
+                        os.path.join(project.javapath, "jarsigner"),
+                        Settings.get("keystore_pass"),
+                        timestamp_flags,
+                        os.path.join(signjars,fn),
+                        Settings.get("keystore_name")
+                    )
+                    print cmd                        
+                    os.system(cmd)
         # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         #return Status.FAILURE if Args.option("strict") else Status.UNSUPPORTED
 

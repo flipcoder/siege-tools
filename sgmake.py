@@ -221,10 +221,10 @@ def main():
 
     if Args.option("version"):
         splash()
-        return
+        return 0
     if Args.option("help") or Args.option("?"):
         help()
-        return
+        return 0
     
     # count of projects succeeded and failed
     success_count = 0
@@ -304,14 +304,20 @@ def main():
             print("%s project(s) completed." % success_count)
             if not failed_count:
                 event("status", "success")
+                return 0
+            else:
+                return 1
         if failed_count:
             print("%s project(s) failed." % failed_count)
             event("status", "failure")
+            return 1
         elif not success_count and not failed_count:
             event("status", "nothing")
             print("Nothing to be done.")
-
+            return 1
+    
+    return 0
 
 if __name__ == "__main__":
-    main()
+    exit(main())
 

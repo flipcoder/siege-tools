@@ -1,4 +1,5 @@
-# siege-tools #
+![siege-tools](https://raw.githubusercontent.com/flipcoder/siege-tools/14b4912238590352658221b1e85d376dd5c660d7/sgtools.png)
+
 http://github.com/flipcoder/siege-tools
 
 Copyright &copy; 2012 Grady O'Connell

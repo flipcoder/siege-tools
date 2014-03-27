@@ -9,8 +9,7 @@ See LICENSE for more information
 =======================================
 
 ## Purpose ##
-Siege Tools is a work-in-progress collection of cross-platform CLI developer tools designed to bring more IDE-like functionality back to the command line.
-It attempts to solve common tedious tasks involved with programming in a way that works with multiple platforms and languages.
+Siege Tools is a build automation toolset.
 
 Currently, the only tool ready for use is SiegeMake (sgmake).
 
@@ -126,11 +125,10 @@ When leader+s is pressed, sgmake does a backwards scan (-R option) for projects 
     - Context-aware file and project templates and generators
 
 - SiegeMod (sgmod)
-    - a multi-language, extensible preprocessor
-    - compatible with sgmake (above)
-    - a state machine of custom switches for your project
+    - a state machine of build switches for your project
+    - manipulate source code abstract syntax trees from an external script similar to jquery's manipulation of DOM
     - does not require embedding incompatible code like other preprocessors
-    - manipulate source code from an external script similar to manipulating DOM
+    - compatible with sgmake (above)
 
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.

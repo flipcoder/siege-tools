@@ -37,7 +37,8 @@ def make(project):
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    if os.path.isfile("Gruntfile.js") or os.path.isfile("Gruntfile.coffee"):
+    if os.path.exists("Gruntfile.js") or\
+        os.path.exists("Gruntfile.coffee"):
         support |= Support.PROJECT
     return support
 

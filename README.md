@@ -9,7 +9,7 @@ See LICENSE for more information
 =======================================
 
 ## Purpose ##
-Siege Tools is a build automation toolset.
+Siege Tools is a plugin-based build automation toolset.
 
 Currently, the only tool ready for use is SiegeMake (sgmake).
 

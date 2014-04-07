@@ -6,6 +6,7 @@ Version 0.7.0
 Copyright (c) 2013 Grady O'Connell
 """
 
+from __future__ import unicode_literals
 import os, sys
 from common import Args
 from common import Status
@@ -13,6 +14,7 @@ from common import Support
 from common.Plugin import Plugin
 import steps
 import events
+import json
 
 def splash():
     print __doc__.strip()
@@ -44,25 +46,27 @@ class Project(object):
         self.status = Status.UNSET
         self.steps = []
 
-    def run_user_config(self, config):
+    def run_user_config(self, cfg):
         for fn in os.listdir("."):
-            if (fn.lower()==config or fn.lower().endswith(".%s" % config)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                # move config options into self.__dict__
-                pass
+            if fn.lower()==cfg  and os.path.isfile(os.path.join(os.getcwd(), fn)):
+                config = json.load(open(cfg))
+                self.__dict__.update(config.get("options",{}))
+                return True
+        return False
     
     def run_user_script(self, script):
         ## Project config
         for fn in os.listdir("."):
-            if (fn.lower()==script or fn.lower().endswith(".%s" % script)) and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                if not Args.option("warn") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
-                    with open(fn) as source:
-                        eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
-                else:
-                    sys.exit(1)
+            if fn.lower()==script and os.path.isfile(os.path.join(os.getcwd(), fn)):
+                #if not Args.option("warn") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
+                with open(fn) as source:
+                    eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
+                #else:
+                #    sys.exit(1)
     
     def complete(self):
-        self.run_user_config("sg.ini")
-        self.run_user_script("sg.py")
+        if not self.run_user_config("sg.json"):
+            self.run_user_script("sg.py")
 
         # update all plugins after script runs
         for step in self.steps:

@@ -21,7 +21,7 @@ def make(project):
         os.path.join(project.dockerpath,"docker"),
         "-D=true",
         "build",
-        "-no-cache",
+        "--no-cache",
         "-t=%s"%project.name,
         ".",
     ]

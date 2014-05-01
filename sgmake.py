@@ -1,8 +1,8 @@
 #!/usr/bin/python2
 """
 Siege-Tools SiegeMake (\"sgmake\")
-Multi-Language Extensible Build Automation
-Version 0.7.0
+Universal Plug-in-Based Build Automation
+Version 0.9.0
 Copyright (c) 2013 Grady O'Connell
 """
 
@@ -99,7 +99,7 @@ class Project(object):
         r = []
         try:
             for e in self.events[name]:
-                r += e.call(name, self, args)
+                r += [e.call(name, self, args)]
         except TypeError:
             pass
         return r
@@ -109,7 +109,7 @@ def event(plugin_type, args):
     try:
         for plugin in events.events[plugin_type]:
             e = Plugin("events", plugin_type, plugin)
-            r += e.call(plugin_type, None, args)
+            r += [e.call(plugin_type, None, args)]
     except TypeError:
         pass
     return r

@@ -27,12 +27,6 @@ Look below at the feature list to see a list of the plug-ins supported.
 Since sgmake is still a work-in-progress, "Action" plug-ins are not yet implemented.  Actions are what allows sgmake to send information from within the build process back to the calling environment.
 An example of this would be if a user runs sgmake from within Vim, the build process can send back errors back or trigger custom notification plug-ins, such as launching a debugger.  These events happen only if the environment supports them, such as OS-specific pop-up notifications), much like the build plug-ins.
 
-###sgrun (SiegeRun)###
-
-A resultant bin directory detector and runner for running a project while
-you're insidea nested directory of that project. (example: ../../bin/here?).
-Tries to avoid supplemental scripts and tests.
-
 #### What is Supported ####
 
 - Automatic cleaning and rebuild
@@ -118,6 +112,20 @@ In your .vimrc add a line like this (assuming siege-tools is in your home dir's 
     nnoremap <leader>s :!/usr/bin/env python2 ~/bin/siege-tools/sgmake.py -R %:p:h<cr>
 
 When leader+s is pressed, sgmake does a backwards scan (-R option) for projects starting from the file you're editing, assuming you're probably editing in either the project or a nested source dir, and then runs the build on the first project it detects using the build system detected.
+
+###sgrun (SiegeRun)###
+
+Ever tried to simply run a program while editing it's code in a deep nested
+directory?  SiegeRun digs deep, finds the binary, and runs it for you.
+
+Example:
+
+Let's say your working dir is MyProject/src/video and you're editing Canvas.cpp
+
+A 'sgrun' call, will find and run:
+MyProjects/bin/mybinary
+
+It also intelligently tries to avoid supplemental scripts and tests.
 
 ## Future ##
 

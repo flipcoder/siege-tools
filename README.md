@@ -115,7 +115,7 @@ When leader+s is pressed, sgmake does a backwards scan (-R option) for projects 
 
 ###sgrun (SiegeRun)###
 
-Ever tried to simply run a program while editing it's code in a deep nested
+Ever tried to simply run a program while editing its code in a deep nested
 directory?  SiegeRun digs deep, finds the binary, and runs it for you.
 
 Example:

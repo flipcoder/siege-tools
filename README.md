@@ -123,7 +123,7 @@ Example:
 Let's say your working dir is MyProject/src/video and you're editing Canvas.cpp
 
 A 'sgrun' call, will find and run:
-MyProjects/bin/mybinary
+MyProject/bin/mybinary
 
 It also intelligently tries to avoid supplemental scripts and tests.
 

@@ -11,7 +11,7 @@ See LICENSE for more information
 ## Purpose ##
 Siege Tools is a plugin-based build automation toolset.
 
-Currently, the only tool ready for use is SiegeMake (sgmake).
+Currently, the only tools ready for use is SiegeMake (sgmake) and SiegeRun (sgrun).
 
 ## Components ##
 
@@ -26,6 +26,12 @@ Look below at the feature list to see a list of the plug-ins supported.
 
 Since sgmake is still a work-in-progress, "Action" plug-ins are not yet implemented.  Actions are what allows sgmake to send information from within the build process back to the calling environment.
 An example of this would be if a user runs sgmake from within Vim, the build process can send back errors back or trigger custom notification plug-ins, such as launching a debugger.  These events happen only if the environment supports them, such as OS-specific pop-up notifications), much like the build plug-ins.
+
+###sgrun (SiegeRun)###
+
+A resultant bin directory detector and runner for running a project while
+you're insidea nested directory of that project. (example: ../../bin/here?).
+Tries to avoid supplemental scripts and tests.
 
 #### What is Supported ####
 
@@ -115,9 +121,8 @@ When leader+s is pressed, sgmake does a backwards scan (-R option) for projects 
 
 ## Future ##
 
+- Installer
 - Improved documentation
-- Better installer
-- Better vim integration
 
 - SiegeTap (sgtap)
     - Alternative to Unix "touch" but with basic project templates

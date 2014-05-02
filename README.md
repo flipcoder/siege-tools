@@ -122,8 +122,8 @@ Example:
 
 Let's say your working dir is MyProject/src/video and you're editing Canvas.cpp
 
-A 'sgrun' call, will find and run:
-MyProject/bin/mybinary
+A 'sgrun' call, will find and run: "MyProject/bin/mybinary" w/
+"MyProject/bin/" as the working directory
 
 It also intelligently tries to avoid supplemental scripts and tests.
 

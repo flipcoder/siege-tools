@@ -240,7 +240,8 @@ def main():
 
     # check for forward recusion and backward scan settings
     recursive = Args.option("recursive")
-    reversive = Args.option("reversive")
+    reversive = True
+    #reversive = Args.option("reversive")
     execute = Args.option("x") or Args.option("execute")
             
     event("status", "start")
@@ -277,7 +278,9 @@ def main():
 
         for fn in Args.filenames:
             path = os.path.abspath(os.path.join(os.getcwd(), fn))
-            while os.path.realpath(path) != os.path.realpath(os.path.join(path, "..")): # is root
+            
+            while os.path.realpath(path) != os.path.expanduser('~'):
+            #while os.path.realpath(path) != os.path.realpath(os.path.join(path, "..")): # is root
 
                 r = try_project(os.path.normpath(path))
                 if r == 1:
@@ -290,15 +293,15 @@ def main():
                     break
 
                 path = os.path.realpath(os.path.join(path, ".."))
-            print "done: %s" % path
-    else:
-        # try to build projects specified by the user, current dir is default
-        for fn in Args.filenames:
-            r = try_project(os.path.join(os.getcwd(),fn))
-            if r == 1:
-                success_count += 1
-            elif r == -1:
-                failed_count += 1
+            #print "done: %s" % path
+    #else:
+    #    # try to build projects specified by the user, current dir is default
+    #    for fn in Args.filenames:
+    #        r = try_project(os.path.join(os.getcwd(),fn))
+    #        if r == 1:
+    #            success_count += 1
+    #        elif r == -1:
+    #            failed_count += 1
 
 
     if not Args.command("list"):

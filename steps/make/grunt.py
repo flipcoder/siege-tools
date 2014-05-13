@@ -12,6 +12,21 @@ def make(project):
     except:
         project.gruntpath = ""
 
+    if os.path.isfile("Gruntfile.ls"):
+        try:
+            project.lscpath = os.path.abspath(os.path.expanduser(Settings.get('lsc_path')))
+        except:
+            project.lscpath = ""
+        lscmd = [
+            os.path.join(project.lscpath,"lsc"),
+            "-c", "Gruntfile.ls"
+        ]
+        try:
+            subprocess.check_call(lscmd)
+        except subprocess.CalledProcessError:
+            return Status.FAILURE
+
+
     #try:
     #    project.grunt_params
     #except:
@@ -38,7 +53,8 @@ def make(project):
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     if os.path.exists("Gruntfile.js") or\
-        os.path.exists("Gruntfile.coffee"):
+        os.path.exists("Gruntfile.coffee") or\
+        os.path.exists("Gruntfile.ls"):
         support |= Support.PROJECT
     return support
 

@@ -12,6 +12,20 @@ def make(project):
     except:
         project.npmpath = ""
 
+    if os.path.isfile("package.json.ls"):
+        try:
+            project.lscpath = os.path.abspath(os.path.expanduser(Settings.get('lsc_path')))
+        except:
+            project.lscpath = ""
+        lscmd = [
+            os.path.join(project.lscpath,"lsc"),
+            "-jc", "package.json.ls"
+        ]
+        try:
+            subprocess.check_call(lscmd)
+        except subprocess.CalledProcessError:
+            return Status.FAILURE
+
     #try:
     #    project.npm_params
     #except:
@@ -37,7 +51,9 @@ def make(project):
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    if os.path.isfile("package.json"):
+    if os.path.isfile("package.json.ls"):
+        support |= Support.PROJECT
+    elif os.path.isfile("package.json"):
         support |= Support.PROJECT
     return support
 

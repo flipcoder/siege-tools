@@ -12,15 +12,24 @@ def make(project):
     except:
         project.npmpath = ""
 
-    if os.path.isfile("package.json.ls"):
+    if os.path.isfile("package.json.ls") or os.path.isfile("package.lson"):
+        
         try:
             project.lscpath = os.path.abspath(os.path.expanduser(Settings.get('lsc_path')))
         except:
             project.lscpath = ""
-        lscmd = [
-            os.path.join(project.lscpath,"lsc"),
-            "-jc", "package.json.ls"
-        ]
+        
+        if os.path.isfile("package.json.ls") :
+            lscmd = [
+                os.path.join(project.lscpath,"lsc"),
+                "-jc", "package.json.ls"
+            ]
+        elif os.path.isfile("package.lson"):
+            lscmd = [
+                os.path.join(project.lscpath,"lsc"),
+                "-jc", "package.lson"
+            ]
+
         try:
             subprocess.check_call(lscmd)
         except subprocess.CalledProcessError:
@@ -51,9 +60,9 @@ def make(project):
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    if os.path.isfile("package.json.ls"):
-        support |= Support.PROJECT
-    elif os.path.isfile("package.json"):
+    if os.path.isfile("package.json") or \
+        os.path.isfile("package.json.ls") or \
+        os.path.isfile("package.lson"):
         support |= Support.PROJECT
     return support
 

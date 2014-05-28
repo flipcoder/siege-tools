@@ -9,11 +9,18 @@ from common.Plugin import Plugin
 import clean.clean
 
 def make(project):
-    os.system(os.path.join(project.qmakepath, "qmake"))
-    #os.system("% -o Makefile %s" % (os.path.join(project.qmakepath, "qmake"), project.qmake_pro_file))
+    os.system(os.path.join(project.qmakepath, project.qmake))
     return Status.SUCCESS
 
 def update(project):
+    try:
+        project.qmake
+    except:
+        project.qmake = "qmake"
+    #project.qmake = Settings.get('qmake')
+    #if not project.qmake:
+    #    project.qmake = "qmake"
+        
     project.qmakepath= Settings.get('qmake_path')
     if project.qmakepath:
         project.qmakepath = os.path.abspath(project.qmakepath)
@@ -54,6 +61,5 @@ def compatible(project):
                 project.qmake_pro_file = os.path.join(os.getcwd(), fn)
                 support |= Support.PROJECT
                 break
-
     return support
 

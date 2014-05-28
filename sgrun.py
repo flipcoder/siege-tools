@@ -49,7 +49,10 @@ if len(exes) == 1:
     args = sys.argv[1:]
     if not args:
         args = []
-    subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+    try:
+        subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+    except:
+        pass
     #os.system(exes[0])
 elif len(exes) > 1:
     print >> sys.stderr, "Too many executables"

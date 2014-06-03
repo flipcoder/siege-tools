@@ -146,7 +146,6 @@ It also intelligently tries to avoid supplemental scripts and tests.
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.
 Once the addon system is done, I could use contributors to write addon steps for different languages and build systems.
-My primary plan is to implement my most familiar languages first (C/C++(+ autotools/make/cmake/premake/scons), Java(+ ant/maven), Vala), and move on from there.
 
 ## Contact ##
 Contact me at flipcoder@gmail.com for questions, comments, etc.

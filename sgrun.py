@@ -4,6 +4,40 @@ import sys
 import subprocess
 exes = []
 cwd = "."
+plugins = []
+p = os.path.abspath(".")
+
+def run():
+    args = sys.argv[1:]
+    if not args:
+        args = []
+    
+    r = 1
+    
+    try:
+        r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+        return r
+    except:
+        pass
+    
+    return 1
+
+def advanced():
+    global exes
+
+    # test plugin "package.json"
+    try:
+        import json
+        with open("package.json") as f:
+            j = json.load(f)
+            exe = j["main"] + ".js"
+            if os.path.isfile(exe):
+                exes = [exe]
+                return run()
+    except:
+        pass
+    
+    return 1
 
 class Break(Exception): pass
 
@@ -46,18 +80,14 @@ if len(exes) > 1:
         exes = exes_old # get the right error message
 
 if len(exes) == 1:
-    args = sys.argv[1:]
-    if not args:
-        args = []
-    try:
-        subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
-    except:
-        pass
+    exit(run())
     #os.system(exes[0])
 elif len(exes) > 1:
-    print >> sys.stderr, "Too many executables"
-    exit(1)
+    r = advanced()
+    if r != 0:
+        print >> sys.stderr, "Too many executables"
 else:
-    print >> sys.stderr, "No executables"
-    exit(1)
+    r = advanced()
+    if r != 0:
+        print >> sys.stderr, "No executables"
 

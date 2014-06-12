@@ -8,7 +8,7 @@ from common import Support
 
 def make(project):
     try:
-        subprocess.check_call(['./configure'])
+        subprocess.check_call(['./configure', '--prefix=/usr'])
     except subprocess.CalledProcessError:
         return Status.FAILURE
     return Status.SUCCESS

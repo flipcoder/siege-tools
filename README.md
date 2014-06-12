@@ -94,9 +94,13 @@ Add this to .vimrc
 
     let makeprg=sgmake\ -R
 
-Then, to build a project from a file inside a project dir, just type in vim;
+Then, to build a project from a file inside a project dir, just type in vim:
 
     :make
+
+Or async version (using [AsyncCommand](https://github.com/pydave/AsyncCommand/))
+
+    :AsyncMake
 
 And to bring up the quicklist, type:
 

@@ -25,6 +25,7 @@ def make(project):
                 "-jc", "package.json.ls"
             ]
         elif os.path.isfile("package.lson"):
+            
             lscmd = [
                 os.path.join(project.lscpath,"lsc"),
                 "-jc", "package.lson"
@@ -56,8 +57,15 @@ def make(project):
     #        " %s" % project.makefile_params
     #    )
     #)
+    
     return Status.SUCCESS
 
+#def update(project):
+    #if os.path.isfile("package.json.ls") or os.path.isfile("package.lson"):
+    #    # remove temp generated package.json
+    #    project.clean += ['package.json']
+    #    pass
+    
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     if os.path.isfile("package.json") or \

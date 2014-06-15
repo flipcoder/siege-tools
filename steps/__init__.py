@@ -102,7 +102,7 @@ def process_path(path):
                 continue
             if name.endswith(".py"):
                 name = step_addon[:-3]
-            elif not path.isdir(name):
+            elif not os.path.isdir(name):
                 continue
             #steps[addon_type][name] = __import__(addon_type, globals(), locals(), [name], -1)
             try:

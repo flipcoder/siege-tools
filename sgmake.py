@@ -45,6 +45,8 @@ class Project(object):
     def __init__(self):
         self.status = Status.UNSET
         self.steps = []
+        if not self.run_user_config("sg.json"):
+            self.run_user_script("sg.py")
 
     def run_user_config(self, cfg):
         for fn in os.listdir("."):
@@ -65,8 +67,8 @@ class Project(object):
                 #    sys.exit(1)
     
     def complete(self):
-        if not self.run_user_config("sg.json"):
-            self.run_user_script("sg.py")
+        #if not self.run_user_config("sg.json"):
+        #    self.run_user_script("sg.py")
 
         # update all plugins after script runs
         for step in self.steps:

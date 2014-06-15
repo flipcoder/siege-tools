@@ -5,9 +5,23 @@ from common import Status
 from common import Support
 from common import Settings
 from common.Plugin import Plugin
+import shutil
 import clean.clean
 
+def generate(project): # can throw
+    tmpl = os.path.join(os.path.split(__file__)[0], "premake/premake4.lua")
+    print tmpl
+    fn = os.path.join(os.getcwd(), "premake4.lua")
+    dest = open(fn, "w")
+    #shutil.copy2(tmpl, os.getcwd())
+    with open(tmpl) as f:
+        for line in f.readlines():
+            line = line.replace("PROJECT_NAME", project.name)
+            dest.write(line + "\n")
+            pass
+
 def make(project):
+    
     premake = ""
     if os.path.isfile("premake4.lua"):
         premake = "premake4"
@@ -30,6 +44,14 @@ def make(project):
     return Status.SUCCESS
 
 def update(project):
+    try:
+        project.generate
+    except:
+        project.generate = []
+    
+    if "premake" in project.generate:
+        generate(project) # can throw
+    
     try:
         project.makepath = os.path.abspath(os.path.expanduser(Settings.get('make_path')))
     except:
@@ -58,6 +80,17 @@ def update(project):
 
 def compatible(project):
     support = Support.MASK & (~Support.PROJECT)
+    try:
+        project.generate
+    except:
+        project.generate = []
+    
+    try:
+        if "premake" in project.generate:
+            support |= Support.PROJECT
+    except:
+        pass
+    
     if os.path.isfile("premake.lua") or os.path.isfile("premake4.lua"):
         support |= Support.PROJECT
     return support

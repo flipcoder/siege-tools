@@ -14,6 +14,11 @@ def clean(project):
     except:
         project.clean_commands = []
 
+    try:
+        project.clean
+    except:
+        project.clean = []
+
     for cmd in project.clean_commands:
         try:
             os.system(cmd)
@@ -22,9 +27,9 @@ def clean(project):
 
     # TODO: parse wildcards and recursive wildcards
 
-    #for path in project.clean:
-    #    print "Removing %s..." % path
-    #    os.remove(path)
+    for path in project.clean:
+        print "Removing %s..." % path
+        os.remove(path)
 
     return Status.SUCCESS
 

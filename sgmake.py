@@ -2,7 +2,7 @@
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Universal Plug-in-Based Build Automation
-Version 0.9.0
+Version 0.9.5
 Copyright (c) 2013 Grady O'Connell
 """
 

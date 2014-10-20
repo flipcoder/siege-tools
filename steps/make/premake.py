@@ -4,6 +4,7 @@ import sgmake
 from common import Status
 from common import Support
 from common import Settings
+from common import Args
 from common.Plugin import Plugin
 import shutil
 import clean.clean
@@ -60,6 +61,16 @@ def update(project):
 
     make_step = Plugin("steps", "make", "makefile")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
+    try:
+        project.makefile_params
+    except:
+        project.makefile_params = []
+    
+    if Args.option("debug"):
+        project.makefile_params += ["config=debug"]
+    else:
+        project.makefile_params += ["config=release"]
+    
     clean_step = Plugin("steps", "clean", "clean")
     if make_step in project.steps:
         project.steps.remove(make_step)

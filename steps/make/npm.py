@@ -39,11 +39,11 @@ def make(project):
     #try:
     #    project.npm_params
     #except:
-    #    project.npm_params = ""
+    #    project.npm_params = []
 
     cmdline = [os.path.join(project.npmpath,"npm"), "install"]
     #if project.npm_params:
-    #    cmdline += [project.makefile_params]
+    #    cmdline += project.npm_params
 
     #print " ".join(cmdline)
 
@@ -52,12 +52,6 @@ def make(project):
     except subprocess.CalledProcessError:
         return Status.FAILURE
 
-    #os.system("%s%s" %
-    #    (os.path.join(project.makepath,"make"),
-    #        " %s" % project.makefile_params
-    #    )
-    #)
-    
     return Status.SUCCESS
 
 #def update(project):

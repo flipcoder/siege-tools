@@ -15,7 +15,7 @@ def make(project):
     try:
         project.makefile_params
     except:
-        project.makefile_params = ""
+        project.makefile_params = []
 
     # example makefile params (add in project sg file):
         # makefile_params="CXX=\'clang++\'"
@@ -23,7 +23,7 @@ def make(project):
 
     cmdline = [os.path.join(project.makepath,"make")]
     if project.makefile_params:
-        cmdline += [project.makefile_params]
+        cmdline += project.makefile_params
 
     try:
         os.chdir(project.build_dir)

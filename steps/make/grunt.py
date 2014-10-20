@@ -30,11 +30,11 @@ def make(project):
     #try:
     #    project.grunt_params
     #except:
-    #    project.grunt_params = ""
+    #    project.grunt_params = []
 
     cmdline = [os.path.join(project.gruntpath,"grunt")]
     #if project.grunt_params:
-    #    cmdline += [project.makefile_params]
+    #    cmdline += project.grunt_params
 
     #print " ".join(cmdline)
 
@@ -43,11 +43,6 @@ def make(project):
     except subprocess.CalledProcessError:
         return Status.FAILURE
 
-    #os.system("%s%s" %
-    #    (os.path.join(project.makepath,"make"),
-    #        " %s" % project.makefile_params
-    #    )
-    #)
     return Status.SUCCESS
 
 def compatible(project):

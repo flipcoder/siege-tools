@@ -6,6 +6,7 @@ exes = []
 cwd = "."
 plugins = []
 p = os.path.abspath(".")
+foldername = ""
 
 def run():
     args = sys.argv[1:]
@@ -36,9 +37,19 @@ def advanced():
                 return run()
     except:
         pass
+
+    # too many exes? use the one that matches outer project folder name
+    try:
+        if len(exes) > 1 and foldername:
+            for exe in exes:
+                if os.path.basename(exe) == foldername:
+                    exes = [foldername]
+                    return run()
+    except:
+        pass
     
     return 1
-
+    
 class Break(Exception): pass
 
 p = os.path.abspath(".")
@@ -50,6 +61,7 @@ try:
                 fn = os.path.join(p, "bin/%s" % f)
                 if not os.path.isdir(fn) and not "." in f and os.access(fn, os.X_OK):
                     exes += [f]
+                    foldername = os.path.basename(os.getcwd())
             if exes:
                 raise Break
         except OSError:
@@ -61,6 +73,10 @@ try:
                 fn = f
                 if not os.path.isdir(fn) and not "." in f and os.access(fn, os.X_OK):
                     exes += [f]
+                    fnp = os.path.basename(os.getcwd())
+                    if fnp == "bin":
+                        fnp = os.path.basename(os.path.abspath(os.path.join(os.getcwd(), "..")))
+                    foldername = os.path.join(os.path.basename(fnp))
             if exes:
                 raise Break
         except OSError:

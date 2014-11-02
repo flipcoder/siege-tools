@@ -18,8 +18,10 @@ def run():
     try:
         if "-l" in args:
             print os.path.join(cwd,exes[0])
+            return 0
         elif "-d" in args:
             print os.path.dirname(cwd)
+            return 0
         else:
             r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
     except:

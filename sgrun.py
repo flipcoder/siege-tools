@@ -12,16 +12,21 @@ def run():
     args = sys.argv[1:]
     if not args:
         args = []
-    
+
     r = 1
     
     try:
-        r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+        if "-l" in args:
+            print os.path.join(cwd,exes[0])
+        elif "-d" in args:
+            print os.path.dirname(cwd)
+        else:
+            r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
         return r
     except:
         pass
     
-    return 1
+    return r
 
 def advanced():
     global exes

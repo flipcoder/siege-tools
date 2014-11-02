@@ -22,7 +22,6 @@ def run():
             print os.path.dirname(cwd)
         else:
             r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
-        return r
     except:
         pass
     

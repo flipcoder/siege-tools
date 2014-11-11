@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sgmake
+import multiprocessing
 import subprocess
 from common import Status
 from common import Settings
@@ -16,6 +17,9 @@ def make(project):
         project.makefile_params
     except:
         project.makefile_params = []
+
+    cores = multiprocessing.cpu_count()
+    project.makefile_params += ["-j" + str(int(cores * 1.5 + 0.5))]
 
     # example makefile params (add in project sg file):
         # makefile_params="CXX=\'clang++\'"

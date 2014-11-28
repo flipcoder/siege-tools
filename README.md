@@ -120,7 +120,7 @@ When leader+s is pressed, sgmake does a backwards scan (-R option) for projects 
 ###sgrun (SiegeRun)###
 
 Ever tried to simply run a program while editing its code in a deep nested
-directory?  SiegeRun digs deep, finds the binary, and runs it for you.
+directory?  SiegeRun digs deep, attempts to figure out which binary you intended to run, and runs it.
 
 Example:
 
@@ -129,7 +129,12 @@ Let's say your working dir is MyProject/src/video and you're editing Canvas.cpp
 A 'sgrun' call, will find and run: "MyProject/bin/mybinary" w/
 "MyProject/bin/" as the working directory
 
-It also intelligently tries to avoid supplemental scripts and tests.
+It also intelligently tries to avoid supplemental scripts and tests, if there is something better to run.
+
+SiegeRun also forwards your parameters to the target, but looks for special "---"-prefixed flags to invokve
+special behavior.  One such switch is "---e" which can filters targets using a regex expression.
+
+SiegeRun also supports Node.js package.json as hints.
 
 ## Future ##
 

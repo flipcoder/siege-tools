@@ -134,7 +134,7 @@ It also intelligently tries to avoid supplemental scripts and tests, if there is
 SiegeRun also forwards your parameters to the target, but looks for special "---"-prefixed flags to invokve
 special behavior.  One such switch is "---e" which can filters targets using a regex expression.
 
-SiegeRun also supports Node.js package.json as hints.
+SiegeRun also supports Node.js package.json files as target hints.
 
 ## Future ##
 

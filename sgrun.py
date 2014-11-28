@@ -35,17 +35,7 @@ def advanced():
     if len(exes) == 1:
         return run()
 
-    # plugin ignore tests?
-    if len(exes) > 1:
-        exes_old = exes
-        exes = [e for e in exes_old if "test" not in e.lower()]
-        if len(exes) == 1:
-            exit(run())
-        else:
-            # restore and continue
-            exes = exes_old
-
-    # plugin "package.json"
+    # plugin: package.json
     try:
         import json
         with open("package.json") as f:
@@ -89,16 +79,25 @@ def advanced():
             exes = [expr]
             return run()
         else: # regex
-            exes = [e for e in exes if re.search(e, expr)]
+            exes = [e for e in exes if re.search(expr, e)]
             if exes:
                 return advanced()
             else:
                 print >> sys.stderr, "No executables matching expression"
                 return 1
-    
         break
+    
+    # plugin: ignore tests
+    if len(exes) > 1:
+        exes_old = exes[:]
+        exes = [e for e in exes_old if "test" not in e.lower()]
+        if len(exes) == 1:
+            exit(run())
+        else:
+            # restore and continue
+            exes = exes_old
 
-    # too many exes? use the one that matches outer project folder name
+    # plugin: project name hint
     try:
         if len(exes) > 1 and foldername:
             for exe in exes:

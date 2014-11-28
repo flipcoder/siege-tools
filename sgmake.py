@@ -213,7 +213,7 @@ def try_project(fn):
 
 
 def main():
-    Args.valid_options = ["list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive", "cache"
+    Args.valid_options = ["clean", "list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive", "cache"
     Args.valid_keys = ["ignore"]
     Args.process()
 

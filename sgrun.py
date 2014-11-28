@@ -1,38 +1,51 @@
 #!/usr/bin/env python2
 import os
 import sys
+import re
 import subprocess
 exes = []
 cwd = "."
 plugins = []
 p = os.path.abspath(".")
 foldername = ""
+args = sys.argv[1:]
+if not args:
+    args = []
 
 def run():
-    args = sys.argv[1:]
-    if not args:
-        args = []
-
+    global args
+    global exes
     r = 1
     
-    try:
-        if "-l" in args:
-            print os.path.join(cwd,exes[0])
-            return 0
-        elif "-d" in args:
-            print os.path.dirname(cwd)
-            return 0
-        else:
-            r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
-    except:
-        pass
-    
+    if "---l" in args:
+        print os.path.join(cwd,exes[0])
+        return 0
+    elif "---d" in args:
+        print os.path.dirname(cwd)
+        return 0
+    else:
+        args = [a for a in args if a.startswith("---")]
+        r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
     return r
 
 def advanced():
     global exes
+    global args
 
-    # test plugin "package.json"
+    if len(exes) == 1:
+        return run()
+
+    # plugin ignore tests?
+    if len(exes) > 1:
+        exes_old = exes
+        exes = [e for e in exes_old if "test" not in e.lower()]
+        if len(exes) == 1:
+            exit(run())
+        else:
+            # restore and continue
+            exes = exes_old
+
+    # plugin "package.json"
     try:
         import json
         with open("package.json") as f:
@@ -44,6 +57,47 @@ def advanced():
     except:
         pass
 
+    # plugin: expression match
+    while True:
+        use_regex = False
+        idx = -1
+        try:
+            idx = args.index("---e")
+            use_regex = True
+        except:
+            pass
+        if idx == -1:
+            try:
+                idx = args.index("---n")
+                use_regex = False
+            except:
+                pass
+        if idx == -1:
+            break
+        try:
+            expr = args[idx+1]
+        except:
+            print >> sys.stderr, "---e flag needs expression param"
+            return 1
+
+        del args[idx+1]
+        del args[idx]
+        if not use_regex:
+            if expr not in exes:
+                print >> sys.stderr, "\"%s\" does not exist" % expr
+                return 1
+            exes = [expr]
+            return run()
+        else: # regex
+            exes = [e for e in exes if re.search(e, expr)]
+            if exes:
+                return advanced()
+            else:
+                print >> sys.stderr, "No executables matching expression"
+                return 1
+    
+        break
+
     # too many exes? use the one that matches outer project folder name
     try:
         if len(exes) > 1 and foldername:
@@ -54,6 +108,10 @@ def advanced():
     except:
         pass
     
+    if len(exes) > 1:
+        print >> sys.stderr, "Too many executables"
+    elif len(exes) == 0:
+        print >> sys.stderr, "No executables"
     return 1
     
 class Break(Exception): pass
@@ -94,22 +152,5 @@ try:
 except Break:
     pass
 
-# attempt to remove test executables that might be present in the current dir
-if len(exes) > 1:
-    exes_old = exes
-    exes = [e for e in exes_old if "test" not in e.lower()]
-    if len(exes) == 0:
-        exes = exes_old # get the right error message
-
-if len(exes) == 1:
-    exit(run())
-    #os.system(exes[0])
-elif len(exes) > 1:
-    r = advanced()
-    if r != 0:
-        print >> sys.stderr, "Too many executables"
-else:
-    r = advanced()
-    if r != 0:
-        print >> sys.stderr, "No executables"
+exit(advanced())
 

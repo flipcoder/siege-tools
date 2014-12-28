@@ -146,12 +146,6 @@ SiegeRun also supports Node.js package.json files as target hints.
     - Generating template projects to use with sgmake or your build system of choice
     - Context-aware file and project templates and generators
 
-- SiegeMod (sgmod)
-    - a state machine of build switches for your project
-    - manipulate source code abstract syntax trees from an external script similar to jquery's manipulation of DOM
-    - does not require embedding incompatible code like other preprocessors
-    - compatible with sgmake (above)
-
 ## Contributing ##
 If you find this project useful, consider contributing or spreading the word to other developers.
 Once the addon system is done, I could use contributors to write addon steps for different languages and build systems.

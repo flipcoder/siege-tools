@@ -140,6 +140,7 @@ SiegeRun also supports Node.js package.json files as target hints.
 
 - Installer
 - Improved documentation
+- Improved error handling
 
 - SiegeTap (sgtap)
     - Alternative to Unix "touch" but with basic project templates

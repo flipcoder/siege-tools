@@ -3,11 +3,18 @@ import os
 import sgmake
 import multiprocessing
 import subprocess
+import tempfile
 from common import Status
 from common import Settings
 from common import Support
 
 def make(project):
+
+    # relink a broken tmpfs-based obj dir
+    if os.path.islink('obj') and not os.path.exists('obj'):
+        os.unlink('obj')
+        os.link(tempfile.mkdtemp(), 'obj')
+    
     try:
         project.makepath = os.path.abspath(os.path.expanduser(Settings.get('make_path')))
     except:

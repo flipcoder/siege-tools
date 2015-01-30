@@ -27,7 +27,8 @@ def run():
     else:
         args = [a for a in args if a.startswith("---")]
         try:
-            with open(os.path.join(os.path.dirname('./'+exes[0]), "sg.json"), 'r') as f:
+            
+            with open(os.path.join(cwd, os.path.dirname(exes[0]), "sg.json"), 'r') as f:
                 j = json.load(f)
                 args += j['args']
         except:

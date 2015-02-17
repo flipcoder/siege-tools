@@ -88,8 +88,16 @@ def make(project):
     return Status.SUCCESS
 
 def set_defaults(project):
-    if not project.sourcepath:
+    try:
+        if not project.sourcepath:
+            project.sourcepath = ["src"]
+    except:
         project.sourcepath = ["src"]
+    try:
+        project.sourcepath.extend(project.sourcepath_append)
+    except:
+        pass
+
     project.obfuscator = None
     project.output = None
     # TODO: "classes" might be output dir, do that in local detect check
@@ -98,7 +106,15 @@ def set_defaults(project):
         project.output_path
     except:
         project.output_path = "dist"
-    project.classpath = ["lib","libs"]
+
+    try:
+        project.classpath
+    except:
+        project.classpath = ["lib","libs"]
+    try:
+        project.classpath.extend(project.classpath_append)
+    except:
+        pass
 
     project.language = "java"
     project.src_ext = ["java"]
@@ -112,7 +128,7 @@ def set_defaults(project):
 
 def update(project):
     project.clean += ["%s/%s.jar" % (project.output_path, project.name) , "%s/**.class" % project.classdir]
-    project.steps = [Plugin("steps","clean","clean")] + project.steps
+    #project.steps = [Plugin("steps","clean","clean")] + project.steps
 
     added = False
 

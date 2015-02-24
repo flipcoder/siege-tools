@@ -24,6 +24,8 @@ def sign(project):
         return
     
     timestamp_flags = "-tsa http://tsa.starfieldtech.com"
+    alias = Settings.get("keystore_name")
+    alias = alias if alias else ""
 
     print "Signing %s..." % project.output
     cmd = "%s -storepass %s %s %s %s" % (
@@ -31,7 +33,7 @@ def sign(project):
         Settings.get("keystore_pass"),
         timestamp_flags,
         project.output,
-        Settings.get("keystore_name")
+        alias
     )
     print cmd
     os.system(cmd)
@@ -49,9 +51,9 @@ def sign(project):
                         Settings.get("keystore_pass"),
                         timestamp_flags,
                         os.path.join(signjars,fn),
-                        Settings.get("keystore_name")
+                        alias
                     )
-                    print cmd                        
+                    print cmd
                     os.system(cmd)
         # TODO: if system call returns with error, then return Status.FAILURE, regardless of --strict
         #return Status.FAILURE if Args.option("strict") else Status.UNSUPPORTED
@@ -70,7 +72,8 @@ def compatible(project):
     # always deny compatibility, step can be added only by registered by another other addon or user script
     support = Support.PROJECT | Support.ENVIRONMENT
 
-    if(Settings.get("keystore_pass") and Settings.get("keystore_name")):
+    #if(Settings.get("keystore_pass") and Settings.get("keystore_name")):
+    if Settings.get("keystore_pass"):
         support |= Support.USER
         
     return support

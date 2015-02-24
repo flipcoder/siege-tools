@@ -5,7 +5,11 @@ from common import Status
 
 def detect(project):
     # TODO: detect dirs
-    project.name = os.path.basename(os.path.abspath(os.getcwd()))
+    try:
+        # allow overriding name
+        project.name
+    except:
+        project.name = os.path.basename(os.path.abspath(os.getcwd()))
     project.sourcepath = ["src"]
     return Status.SUCCESS
 

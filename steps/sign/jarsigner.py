@@ -24,14 +24,16 @@ def sign(project):
         return
     
     timestamp_flags = "-tsa http://tsa.starfieldtech.com"
+    digest_flags = "-digestalg SHA1"
     alias = Settings.get("keystore_name")
     alias = alias if alias else ""
 
     print "Signing %s..." % project.output
-    cmd = "%s -storepass %s %s %s %s" % (
+    cmd = "%s -storepass %s %s %s %s %s" % (
         os.path.join(project.javapath,"jarsigner"),
         Settings.get("keystore_pass"),
         timestamp_flags,
+        digest_flags,
         project.output,
         alias
     )
@@ -46,10 +48,11 @@ def sign(project):
                 #if fn.lower().endswith(".%s" % project.bin_ext):
                 if fn.lower().endswith(".jar"):
                     #print "Signing %s..." % fn
-                    cmd = "%s -storepass %s %s %s %s" % (
+                    cmd = "%s -storepass %s %s %s %s %s" % (
                         os.path.join(project.javapath, "jarsigner"),
                         Settings.get("keystore_pass"),
                         timestamp_flags,
+                        digest_flags,
                         os.path.join(signjars,fn),
                         alias
                     )

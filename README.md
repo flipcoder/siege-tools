@@ -17,15 +17,20 @@ Currently, the only tools ready for use is SiegeMake (sgmake) and SiegeRun (sgru
 
 ###sgmake (SiegeMake)###
 
-sgmake is a build system auto-detector / wrapper.  It's job is to select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.  Build systems can chose to add other steps needed as they're detected, and/or reorder them as needed.  If no build system is found, it can look at the filetypes and even analyze the source files to see if the project can still be built.
+sgmake is a build automation system.  It's job is to intelligently select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.  Build systems can chose to add other steps needed as they're detected, and/or reorder them as needed.
+If no build system is found, it can look at the filetypes and even analyze the source files to see if the project can still be built.
+
+The goal of Sgmake is to build most source-based projects out of the box, without difficulty.
+This allows for projects to pull and build dependencies from any
+source-based project easily, without having to support the same build systems.
 
 Detector plug-ins run first, and provide information about each project to the other plug-ins, such as the count and percentages of certain filetypes, and other clues about the project environment.
+These clues inform later plug-ins of how to build the provided package.
 
-Each step of the build process has its own set of plug-ins.  The plug-in types are detect, analyze, clean, preprocess, make, obfuscate, doc, sign, package, install, test, and deploy.
+Each step of the build process has its own set of plug-ins.  The plug-in types
+are detect, analyze, clean, preprocess, make, obfuscate, doc, sign, package, install, test, and deploy.
+These plug-ins work together as a decision-tree to build a project completely.
 Look below at the feature list to see a list of the plug-ins supported.
-
-Since sgmake is still a work-in-progress, "Action" plug-ins are not yet implemented.  Actions are what allows sgmake to send information from within the build process back to the calling environment.
-An example of this would be if a user runs sgmake from within Vim, the build process can send back errors back or trigger custom notification plug-ins, such as launching a debugger.  These events happen only if the environment supports them, such as OS-specific pop-up notifications), much like the build plug-ins.
 
 #### What is Supported ####
 
@@ -139,6 +144,7 @@ SiegeRun also supports Node.js package.json files as target hints.
 
 ## Future ##
 
+- JSON-based dependencies, with system package managers and git-based providers
 - Installer
 - Improved documentation
 - Improved error handling

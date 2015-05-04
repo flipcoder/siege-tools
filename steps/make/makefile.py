@@ -4,6 +4,8 @@ import sgmake
 import multiprocessing
 import subprocess
 import tempfile
+import psutil
+import math
 from common import Status
 from common import Settings
 from common import Support
@@ -27,7 +29,10 @@ def make(project):
         project.makefile_params = []
 
     cores = multiprocessing.cpu_count()
-    project.makefile_params += ["-j" + str(int(cores * 1.5 + 0.5))]
+    threads = int(cores * 1.5 + 0.5)
+    # to prevent ram overusage (freezes), cap thread count to # GB of ram
+    threads = int(min(threads, math.ceil(psutil.virtual_memory().total/1024/1024/1024.0)))
+    project.makefile_params += ["-j" + str(threads)]
 
     # example makefile params (add in project sg file):
         # makefile_params="CXX=\'clang++\'"

@@ -13,6 +13,10 @@ args = sys.argv[1:]
 if not args:
     args = []
 
+def path_equals(a, b):
+    return os.path.normpath(os.path.expanduser(a)) == \
+        os.path.normpath(os.path.expanduser(b))
+
 def run():
     global args
     global exes
@@ -116,6 +120,7 @@ def advanced():
         pass
     
     if len(exes) > 1:
+        print >> sys.stderr, 'Found %s executables: %s' % (len(exes), ', '.join(exes))
         print >> sys.stderr, "Too many executables"
     elif len(exes) == 0:
         print >> sys.stderr, "No executables"
@@ -130,7 +135,7 @@ try:
             cwd = os.path.join(p, "bin")
             for f in os.listdir(cwd):
                 fn = os.path.join(p, "bin/%s" % f)
-                if not os.path.isdir(fn) and not "." in f and os.access(fn, os.X_OK):
+                if not os.path.isdir(fn) and os.access(fn, os.X_OK):
                     exes += [f]
                     foldername = os.path.basename(os.getcwd())
             if exes:
@@ -142,7 +147,7 @@ try:
             cwd = p
             for f in os.listdir(p):
                 fn = f
-                if not os.path.isdir(fn) and not "." in f and os.access(fn, os.X_OK):
+                if not os.path.isdir(fn) and os.access(fn, os.X_OK):
                     exes += [f]
                     fnp = os.path.basename(os.getcwd())
                     if fnp == "bin":
@@ -152,9 +157,9 @@ try:
                 raise Break
         except OSError:
             pass
-        
+
         p = os.path.abspath(os.path.join(p, ".."))
-        if p == "/":
+        if p == "/" or path_equals(p,"~") or path_equals(p,"~/bin"):
             break
 except Break:
     pass

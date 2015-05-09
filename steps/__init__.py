@@ -107,9 +107,8 @@ def process_path(path):
             #steps[addon_type][name] = __import__(addon_type, globals(), locals(), [name], -1)
             try:
                 steps[addon_type][name] = importlib.import_module("%s.%s" % (addon_type, name))
-            except ImportError:
-                #print e
-                print >> sys.stderr, "Missing dependency for addon \'%s\'" % name
+            except ImportError as e:
+                print >> sys.stderr, "Missing dependency for addon \'%s\': %s" % (name, e.message)
 
 def process():
     process_path(os.path.dirname(os.path.realpath(__file__)))

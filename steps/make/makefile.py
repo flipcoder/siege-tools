@@ -4,13 +4,13 @@ import sgmake
 import multiprocessing
 import subprocess
 import tempfile
-import psutil
 import math
 from common import Status
 from common import Settings
 from common import Support
 
 def make(project):
+    import psutil
 
     # relink a broken tmpfs-based obj dir
     if os.path.islink('obj') and not os.path.exists('obj'):

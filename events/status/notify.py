@@ -10,6 +10,7 @@ inited = False
 def status(project, args):
     try:
         from gi.repository import Notify
+        from gi.repository import GLib
     except:
         return
     
@@ -19,20 +20,23 @@ def status(project, args):
         Notify.init("sgmake")
         inited = True
 
-    #if not "step" in args and not "start" in args:
-    if "success" == args:
-        Notify.Notification.new(
-            "sgmake",
-            "Build Complete",
-            'dialog-information'
-        ).show()
-    
-    if "failure" == args:
-        Notify.Notification.new(
-            "sgmake",
-            "Build Failure",
-            'dialog-error'
-        ).show()
+    try:
+        #if not "step" in args and not "start" in args:
+        if "success" == args:
+            Notify.Notification.new(
+                "sgmake",
+                "Build Complete",
+                'dialog-information'
+            ).show()
+        
+        if "failure" == args:
+            Notify.Notification.new(
+                "sgmake",
+                "Build Failure",
+                'dialog-error'
+            ).show()
+    except GLib.Error:
+        pass # notifications disabled
 
 def compatible(project):
     try:

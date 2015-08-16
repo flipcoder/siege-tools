@@ -126,12 +126,12 @@ When leader+s is pressed, sgmake does a backwards scan (-R option) for projects 
 An async alternative to the above using [vim-dispatch](https://github.com/tpope/vim-dispatch/):
 
     " (S)gmake (build) the associated project
-    nmap <leader>S :w<cr>:Dispatch! sgmake -Rd<cr>
+    nmap <leader>s :w<cr>:Dispatch! sgmake -Rd<cr>
 
 You may also want to run the application once the build finishes:
 
     " (R)un the associated program using sgrun
-    nmap <leader>R :w<cr>:Dispatch! sgrun<cr>
+    nmap <leader>r :w<cr>:Dispatch! sgrun<cr>
 
 ###sgrun (SiegeRun)###
 

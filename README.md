@@ -119,9 +119,19 @@ command at the context of the first error.  I haven't written this part yet thou
 
 In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
 
-    nnoremap <leader>s :!/usr/bin/env python2 ~/bin/siege-tools/sgmake.py -R %:p:h<cr>
+    nnoremap <leader>s :w<cr>:!sgmake -R %:p:h<cr>
 
 When leader+s is pressed, sgmake does a backwards scan (-R option) for projects starting from the file you're editing, assuming you're probably editing in either the project or a nested source dir, and then runs the build on the first project it detects using the build system detected.
+
+An async alternative to the above using [vim-dispatch](https://github.com/tpope/vim-dispatch/):
+
+    " (S)gmake (build) the associated project
+    nmap <leader>S :w<cr>:Dispatch! sgmake -Rd<cr>
+
+You may also want to run the application once the build finishes:
+
+    " (R)un the associated program using sgrun
+    nmap <leader>R :w<cr>:Dispatch! sgrun<cr>
 
 ###sgrun (SiegeRun)###
 

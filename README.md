@@ -38,10 +38,10 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 
 #### What is Supported ####
 
+- Makefile projects
 - Premake projects
 - CMake projects
 - Source-only Java projects with manifest files
-- Make-based projects
 - Qt qmake
 - Node.js npm packages
 - Bower packages
@@ -50,8 +50,8 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 - Allatori obfuscation
 - Java Jar Signing
 - IZPack installer packaging
-- NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
-- Multi-threaded make (auto-adds -j based on # cores)
+- NSIS Installers (using Wine on non-windows platforms)
+- Automatic multi-threading
 - RAM-based compilation (auto-relinking of tmpfs-mounted obj folder)
 - Status notifications
 

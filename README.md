@@ -38,7 +38,6 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 
 #### What is Supported ####
 
-- Automatic cleaning and rebuild
 - Premake projects
 - CMake projects
 - Source-only Java projects with manifest files
@@ -53,7 +52,7 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 - IZPack installer packaging
 - NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
 - Multi-threaded make (auto-adds -j based on # cores)
-- RAM-based compilation (WIP, auto-relinking of tmpfs-mounted obj folder)
+- RAM-based compilation (auto-relinking of tmpfs-mounted obj folder)
 - Status notifications
 
 #### Basic Usage ####

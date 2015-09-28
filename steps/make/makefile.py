@@ -30,8 +30,8 @@ def make(project):
 
     cores = multiprocessing.cpu_count()
     threads = int(cores * 1.5 + 0.5)
-    # to prevent ram overusage (freezes), cap thread count to # GB of ram
-    threads = int(min(threads, math.ceil(psutil.virtual_memory().total/1024/1024/1024.0)))
+    # to prevent ram overusage (and thus HD hits), cap thread count to # GB of ram / 2
+    threads = int(min(threads, math.ceil(psutil.virtual_memory().total/1024/1024/1024.0)/1.5))
     project.makefile_params += ["-j" + str(threads)]
 
     # example makefile params (add in project sg file):

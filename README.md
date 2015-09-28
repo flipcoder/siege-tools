@@ -10,6 +10,7 @@ See LICENSE for more information
 
 ## Purpose ##
 Siege Tools is a plugin-based build automation toolset.
+Combined with Vim, or an equally powerful text editor, siege-tools attempts to narrow the gap between the CLI and traditional IDEs by introducing a set of plug-in-based/modular components responsible for the uniform build and execution of projects of incompatible types.
 
 Currently, the only tools ready for use are SiegeMake (sgmake) and SiegeRun (sgrun).
 
@@ -17,20 +18,23 @@ Currently, the only tools ready for use are SiegeMake (sgmake) and SiegeRun (sgr
 
 ###sgmake (SiegeMake)###
 
-sgmake is a build automation system.  It's job is to intelligently select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.  Build systems can chose to add other steps needed as they're detected, and/or reorder them as needed.
+sgmake is a build automation system.  It's job is to intelligently select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.
 If no build system is found, it can look at the filetypes and even analyze the source files to see if the project can still be built.
 
-The goal of Sgmake is to build most source-based projects out of the box, without difficulty.
-This allows for projects to pull and build dependencies from any
-source-based project easily, without having to support the same build systems.
-
 Detector plug-ins run first, and provide information about each project to the other plug-ins, such as the count and percentages of certain filetypes, and other clues about the project environment.
-These clues inform later plug-ins of how to build the provided package.
+These clues inform plug-ins of how to build the project.
 
 Each step of the build process has its own set of plug-ins.  The plug-in types
 are detect, analyze, clean, preprocess, make, obfuscate, doc, sign, package, install, test, and deploy.
-These plug-ins work together as a decision-tree to build a project completely.
 Look below at the feature list to see a list of the plug-ins supported.
+
+The goals of Sgmake are as follows:
+ - Make it significantly easier to build source-based projects out of the box by removing the need for a person to manually recognize each system and manually execute each step build process. (Success)
+ - Wrap most common systems and introduce a way to easily wrap any newer systems. (Success)
+ - Wrap dependency sources. (Almost there)
+ - Encourage (through plug-ins) saner behavior of older systems by optionally bringing in newer tools when they are supported by the system. (Success) )
+
+Siege-tools builds makefile-projects significantly faster than the naive "make" in most cases, respects ram/tmp-mounted temporaries to improve lifetime of SSDs, and optionally uses ccache for faster rebuilds when detected.
 
 #### What is Supported ####
 
@@ -50,6 +54,7 @@ Look below at the feature list to see a list of the plug-ins supported.
 - NSIS Installers (using Wine on non-windows platforms) (very early proof-of-concept, but it "works")
 - Multi-threaded make (auto-adds -j based on # cores)
 - RAM-based compilation (WIP, auto-relinking of tmpfs-mounted obj folder)
+- Status notifications
 
 #### Basic Usage ####
 
@@ -57,6 +62,7 @@ This example assumes you're using Linux, but MacOS should work similarly.
 
 There's no installer right now, so simply create an alias using your shell to call the sgmake.py file when you type "sgmake",
 This is the best bet so you can keep the git repo current as I change things.
+
 Example:
 
     alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
@@ -80,7 +86,7 @@ To build a batch of sgmake projects recursively:
 
     sgmake -r
 
-To build a project from a nested directory inside a project (such as in a src/ folder:
+To detect and build a project from a deeply nested directory inside a project (such as in a src/ folder):
 
     sgmake -R
 
@@ -117,7 +123,7 @@ command at the context of the first error.  I haven't written this part yet thou
 
 ##### Calling from Vim (alternative to above) #####
 
-In your .vimrc add a line like this (assuming siege-tools is in your home dir's bin and <leader>s is your choice for sgmake key):
+In your .vimrc add a line like this (assuming <leader>s is your choice for sgmake key):
 
     nnoremap <leader>s :w<cr>:!sgmake -R %:p:h<cr>
 

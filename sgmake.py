@@ -47,6 +47,14 @@ class Project(object):
         self.steps = []
         if not self.run_user_config("sg.json"):
             self.run_user_script("sg.py")
+        self.back_up_env = os.environ
+        
+        try:
+            if 'env' in self.options:
+                for k,v in env:
+                    os.environ[k] = v
+        except AttributeError:
+            pass
 
     def run_user_config(self, cfg):
         for fn in os.listdir("."):

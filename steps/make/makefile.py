@@ -15,7 +15,7 @@ def make(project):
     # relink a broken tmpfs-based obj dir
     if os.path.islink('obj') and not os.path.exists('obj'):
         os.unlink('obj')
-        prefix = 'sg-' + os.getlogin() + '-' + project.name + '-'
+        prefix = 'sg-' + os.environ.get('LOGNAME') + '-' + project.name + '-'
         os.symlink(tempfile.mkdtemp(prefix=prefix), 'obj')
         
     try:

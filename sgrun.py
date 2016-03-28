@@ -29,7 +29,7 @@ def run():
         print os.path.dirname(cwd)
         return 0
     else:
-        args = [a for a in args if a.startswith("---")]
+        args = [a for a in args if not a.startswith("---")]
         try:
             
             with open(os.path.join(cwd, os.path.dirname(exes[0]), "sg.json"), 'r') as f:

@@ -43,7 +43,7 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 - CMake
 - Java source w/ manifest
 - Qt qmake
-- Monodevelop xbuild
+- Mono xbuild
 - Node.js npm packages
 - Bower packages
 - Docker dockerfiles

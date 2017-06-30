@@ -6,8 +6,9 @@ user_settings = {}
 
 def settings_load(fn):
     if fn.lower().endswith('.py'):
+        home = os.path.expanduser("~")
         try:
-            fn = os.environ['HOME']+os.sep+fn
+            fn = home+os.sep+fn
             with open(fn) as source:
                 eval(compile(source.read(), fn, 'exec'), {}, user_settings)
             return True

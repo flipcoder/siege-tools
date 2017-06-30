@@ -41,6 +41,7 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 - Makefile
 - Premake
 - CMake
+- msbuild (Visual Studio)
 - Java source w/ manifest
 - Qt qmake
 - Mono xbuild

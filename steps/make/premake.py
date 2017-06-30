@@ -24,7 +24,9 @@ def generate(project): # can throw
 def make(project):
     
     premake = ""
-    if os.path.isfile("premake4.lua"):
+    if os.path.isfile("premake5.lua"):
+        premake = "premake5"
+    elif os.path.isfile("premake4.lua"):
         premake = "premake4"
     elif os.path.isfile("premake.lua"):
         premake = "premake"
@@ -32,7 +34,10 @@ def make(project):
     try:
         project.premake_platform
     except:
-        project.premake_platform = "gmake"
+        if os.name=="nt":
+            project.premake_platform = "vs2017"
+        else:
+            project.premake_platform = "gmake"
 
     premake_platform_param = ""
     try:
@@ -59,7 +64,11 @@ def update(project):
         project.makepath = ""
     # make sure theres a make step after premake
 
-    make_step = Plugin("steps", "make", "makefile")
+    if os.name == "nt":
+        # TODO: check for user setting for windows compiler, default to msbuild
+        make_step = Plugin("steps", "make", "msbuild")
+    else: # linux, mac, unixy-win (cygwin,msys)
+        make_step = Plugin("steps", "make", "makefile")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
     try:
         project.makefile_params

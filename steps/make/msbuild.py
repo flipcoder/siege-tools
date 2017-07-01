@@ -56,6 +56,8 @@ def update(project):
     # TODO: check for user provided filename before overriding, if it exists, skip this step and the ls
     try:
         project.msbuild_params
+        # no need to generate params, we're done
+        return
     except:
         project.msbuild_params = []
 
@@ -70,7 +72,7 @@ def update(project):
                 break
     
     if projs > 1:
-        project.msbuild_params += [project.name]
+        project.msbuild_params += [project.name+".sln"]
     else:
         project.msbuild_params += [projname]
 

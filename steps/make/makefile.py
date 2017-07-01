@@ -33,8 +33,8 @@ def make(project):
     try:
         import psutil
         threads = int(min(threads, math.ceil(psutil.virtual_memory().total/1024/1024/1024.0)/1.5))
-        print "WARNING: psutil package not found, threaded compiles may be unstable"
     except ImportError:
+        print "WARNING: psutil package not found, threaded compiles may be unstable"
         pass
     project.makefile_params += ["-j" + str(threads)]
 

@@ -79,7 +79,8 @@ class Project(object):
         #    self.run_user_script("sg.py")
 
         # update all plugins after script runs
-        for step in self.steps:
+        steps = self.steps[:] # update may modify during iteration
+        for step in steps:
             step.call("update", self)
             #steps.update(step.type(), step.name(), self)
 

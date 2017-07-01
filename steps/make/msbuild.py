@@ -12,13 +12,13 @@ from common.Plugin import Plugin
 
 def make(project):
 
-    # TODO: if only one project exists, specify it as param to msbuild
-    # otherwise, build main proj
-
-    # project.msbuild_params += "test.vcxproj"
+    try:
+        project.makepath = os.path.abspath(os.path.expanduser(Settings.get('make_path')))
+    except:
+        project.makepath = ""
 
     # TODO: detect a suitable vcvars if the environment isnt init
-    
+
     cmdline = [os.path.join(project.makepath,"msbuild")]
     if project.msbuild_params:
         cmdline += project.msbuild_params
@@ -76,10 +76,17 @@ def update(project):
 
 
 def compatible(project):
-    support = Support.MASK & (~Support.PROJECT) & (~Support.ENVIRONMENT)
+    support = Support.USER
+    
+    for fn in os.listdir(os.getcwd()):
+        if os.path.isfile(os.path.join(os.getcwd(),fn)):
+            fnl = fn.lower()
+            if fnl.endswith(".sln"):
+                support |= Support.PROJECT
+                support |= Support.AUTO
+
     if os.name=="nt":
         support |= Support.ENVIRONMENT
-    if os.path.isfile("Makefile"):
-        support |= Support.PROJECT
+    
     return support
 

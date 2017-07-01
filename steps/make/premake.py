@@ -64,11 +64,9 @@ def update(project):
         project.makepath = ""
     # make sure theres a make step after premake
 
+    make_step = Plugin("steps", "make", "makefile")
     if os.name == "nt":
-        # TODO: check for user setting for windows compiler, default to msbuild
-        make_step = Plugin("steps", "make", "msbuild")
-    else: # linux, mac, unixy-win (cygwin,msys)
-        make_step = Plugin("steps", "make", "makefile")
+        msb_step = Plugin("steps", "make", "msbuild")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
     try:
         project.makefile_params
@@ -83,10 +81,17 @@ def update(project):
     clean_step = Plugin("steps", "clean", "clean")
     if make_step in project.steps:
         project.steps.remove(make_step)
+    if os.name == "nt":
+        if msb_step in project.steps:
+            project.steps.remove(msb_step)
     if clean_step in project.steps:
         project.steps.remove(clean_step)
 
     i = 0
+    
+    if os.name == "nt":
+        make_step = msb_step
+        
     for s in project.steps:
         if s.type == "make" and s.name == "premake":
             # TODO: check for user support (because of -r flag)
@@ -97,6 +102,8 @@ def update(project):
                 project.steps.insert(i+1, make_step)
             break
         i += 1
+
+    make_step.call("update", project)
 
 def compatible(project):
     support = Support.MASK & (~Support.PROJECT)
@@ -111,7 +118,9 @@ def compatible(project):
     except:
         pass
     
-    if os.path.isfile("premake.lua") or os.path.isfile("premake4.lua"):
+    if os.path.isfile("premake.lua") or \
+        os.path.isfile("premake4.lua") or \
+        os.path.isfile("premake5.lua"):
         support |= Support.PROJECT
     return support
 

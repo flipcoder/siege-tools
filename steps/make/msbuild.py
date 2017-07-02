@@ -20,6 +20,7 @@ def make(project):
     # TODO: detect a suitable vcvars if the environment isnt init
 
     cmdline = [os.path.join(project.makepath,"msbuild")]
+    cmdline += ["/p:Platform=Win32"]
     if project.msbuild_params:
         cmdline += project.msbuild_params
 

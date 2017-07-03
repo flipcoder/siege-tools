@@ -35,12 +35,15 @@ def update(project):
     # make sure theres a make step after cmake
 
     make_step = Plugin("steps", "make", "makefile")
+    conf_step = Plugin("steps", "make", "configure")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
     clean_step = Plugin("steps", "clean", "clean")
     if make_step in project.steps:
         project.steps.remove(make_step)
     if clean_step in project.steps:
         project.steps.remove(clean_step)
+    if conf_step in project.steps:
+        project.steps.remove(conf_step)
 
     i = 0
     for s in project.steps:

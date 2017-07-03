@@ -65,6 +65,7 @@ def update(project):
     # make sure theres a make step after premake
 
     make_step = Plugin("steps", "make", "makefile")
+    conf_step = Plugin("steps", "make", "configure")
     if os.name == "nt":
         msb_step = Plugin("steps", "make", "msbuild")
     project.clean_commands = ["%s clean" % os.path.join(project.makepath,"make")]
@@ -81,6 +82,8 @@ def update(project):
     clean_step = Plugin("steps", "clean", "clean")
     if make_step in project.steps:
         project.steps.remove(make_step)
+    if conf_step in project.steps:
+        project.steps.remove(conf_step)
     if os.name == "nt":
         if msb_step in project.steps:
             project.steps.remove(msb_step)

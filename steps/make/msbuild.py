@@ -8,6 +8,7 @@ import math
 from common import Status
 from common import Settings
 from common import Support
+from common import Args
 from common.Plugin import Plugin
 
 def make(project):
@@ -21,6 +22,10 @@ def make(project):
 
     cmdline = [os.path.join(project.makepath,"msbuild")]
     cmdline += ["/p:Platform=Win32"]
+    if Args.option("debug"):
+        cmdline += ["/p:Configuration=Debug"]
+    else:
+        cmdline += ["/p:Configuration=Release"]
     if project.msbuild_params:
         cmdline += project.msbuild_params
 

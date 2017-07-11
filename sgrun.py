@@ -31,18 +31,22 @@ def run():
     else:
         args = [a for a in args if not a.startswith("---")]
         try:
-            
             with open(os.path.join(cwd, os.path.dirname(exes[0]), "sg.json"), 'r') as f:
                 j = json.load(f)
                 args += j['args']
         except:
             pass
-        r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+        
+        if os.name=="nt":
+            r = subprocess.call([os.path.join(cwd,exes[0])] + args, cwd=(cwd))
+        else:
+            r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
     return r
 
 def advanced():
     global exes
     global args
+    global foldername
 
     if len(exes) == 1:
         return run()
@@ -128,6 +132,14 @@ def advanced():
     
 class Break(Exception): pass
 
+def exe(fn):
+    if os.path.isdir(fn):
+        return False
+    if os.name=='nt':
+        return fn.lower().endswith(".exe")
+    else:
+        return os.access(fn, os.X_OK)
+
 p = os.path.abspath(".")
 try:
     while True:
@@ -135,9 +147,8 @@ try:
             cwd = os.path.join(p, "bin")
             for f in os.listdir(cwd):
                 fn = os.path.join(p, "bin/%s" % f)
-                if not os.path.isdir(fn) and os.access(fn, os.X_OK):
+                if exe(fn):
                     exes += [f]
-                    foldername = os.path.basename(os.getcwd())
             if exes:
                 raise Break
         except OSError:
@@ -147,7 +158,7 @@ try:
             cwd = p
             for f in os.listdir(p):
                 fn = f
-                if not os.path.isdir(fn) and os.access(fn, os.X_OK):
+                if exe(fn):
                     exes += [f]
                     fnp = os.path.basename(os.getcwd())
                     if fnp == "bin":

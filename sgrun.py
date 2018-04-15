@@ -51,7 +51,17 @@ def advanced():
     if len(exes) == 1:
         return run()
 
-    # plugin: package.json
+    # plugin: project name hint
+    try:
+        if len(exes) > 1 and foldername:
+            for exe in exes:
+                if os.path.basename(exe) == foldername:
+                    exes = [foldername]
+                    return run()
+    except:
+        pass
+
+    # TODO: plugin: package.json
     try:
         import json
         with open("package.json") as f:
@@ -63,7 +73,44 @@ def advanced():
     except:
         pass
 
-    # plugin: expression match
+    # TODO: plugin: python
+    # try:
+    while True:
+        pys = []
+        for fn in os.listdir("."):
+            fnl = fn.lower()
+            # if fnl == "requirements.txt":
+            #     if os.name == "nt":
+            #         exes = ["python"] # TODO: version detection?
+            if fnl.endswith(".py"):
+                pys += [fn]
+
+            if len(pys) == 1:
+                pass
+            elif len(pys) > 1:
+                for py in pys:
+                    if os.name == "nt":
+                        exes = ["python"]
+                        args = [fn] + args
+                        break
+                    else:
+                        exes = [fn]
+                        break
+                
+                    fn_noext = fn[:-3]
+                    fn_noext_l = fn_noext.lower()
+                    if fn_noext_l == "main" or  fnl_noext_l == foldername:
+                        if os.name == "nt":
+                            exes = ["python"]
+                            args = [fn] + args
+                            break
+                        else:
+                            exes = [fn]
+                            break
+        break
+
+
+    # TODO: plugin: expression match
     while True:
         use_regex = False
         idx = -1
@@ -112,16 +159,6 @@ def advanced():
         else:
             # restore and continue
             exes = exes_old
-
-    # plugin: project name hint
-    try:
-        if len(exes) > 1 and foldername:
-            for exe in exes:
-                if os.path.basename(exe) == foldername:
-                    exes = [foldername]
-                    return run()
-    except:
-        pass
     
     if len(exes) > 1:
         print >> sys.stderr, 'Found %s executables: %s' % (len(exes), ', '.join(exes))

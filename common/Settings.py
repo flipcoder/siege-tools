@@ -22,12 +22,12 @@ def settings_load(fn):
 def settings():
     return settings
 
-def get(fn):
+def get(fn, d=None):
     try:
         return user_settings[fn]
     except:
         pass
-    return None
+    return d
 
 for fn in (".sgrc.py", "_sgrc.py", ".sgrc.json", "_sgrc.json"):
     if settings_load(fn):

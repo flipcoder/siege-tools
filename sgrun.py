@@ -1,9 +1,7 @@
 #!/usr/bin/env python2
-import os
-import sys
-import re
-import subprocess
-import json
+import os,sys,re,subprocess,json
+from backports.shutil_which import which
+prefix = []
 exes = []
 cwd = "."
 plugins = []
@@ -20,8 +18,24 @@ def path_equals(a, b):
 def run():
     global args
     global exes
+    global prefix
     r = 1
-    
+
+    optional_prefix = False
+    for arg in args:
+        if arg.startswith('---p='):
+            arg = arg[len('---p='):]
+            prefix += arg.split(',')
+            break
+        if arg.startswith('---op='):
+            arg = arg[len('---op='):]
+            prefix += arg.split(',')
+            break
+
+    if prefix and not optional_prefix and not which(prefix[0]):
+        print >> sys.stderr, "prefix not found"
+        return 1
+
     if "---l" in args:
         print os.path.join(cwd,exes[0])
         return 0
@@ -38,9 +52,9 @@ def run():
             pass
         
         if os.name=="nt":
-            r = subprocess.call([os.path.join(cwd,exes[0])] + args, cwd=(cwd))
+            r = subprocess.call(prefix + [os.path.join(cwd,exes[0])] + args, cwd=(cwd))
         else:
-            r = subprocess.call(['./'+exes[0]] + args, cwd=(cwd))
+            r = subprocess.call(prefix + ['./'+exes[0]] + args, cwd=(cwd))
     return r
 
 def advanced():

@@ -9,6 +9,8 @@ inited = False
 
 def status(project, args):
     try:
+        import gi
+        gi.require_version('Notify','0.7')
         from gi.repository import Notify
         from gi.repository import GLib
     except:
@@ -40,6 +42,8 @@ def status(project, args):
 
 def compatible(project):
     try:
+        import gi
+        gi.require_version('Notify','0.7')
         from gi.repository import Notify
     except ImportError:
         return Support.MASK & ~Support.ENVIRONMENT

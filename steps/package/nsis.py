@@ -5,16 +5,17 @@ import subprocess
 from common import Status
 from common import Settings
 from common import Support
+from common import call
 
 def package(project):
     wine = False if platform.system() == "Windows" else True
 
     if wine:
         try:
-            subprocess.check_call(["makensis", project.nsi_file])
+            call(["makensis", project.nsi_file])
         except OSError:
             try:
-                subprocess.check_call(["wine",  "\"c:/Program Files (x86)/NSIS/makensis.exe\"", project.nsi_file])
+                call(["wine",  "\"c:/Program Files (x86)/NSIS/makensis.exe\"", project.nsi_file])
             except OSError:
                 return Status.UNSUPPORTED
             #except subprocess.CalledProcessError:
@@ -23,7 +24,7 @@ def package(project):
         #    return Status.FAILURE
     else:
         try:
-            subprocess.check_call(["makensis", project.nsi_file])
+            call(["makensis", project.nsi_file])
         except OSError:
             return Status.UNSUPPORTED
 

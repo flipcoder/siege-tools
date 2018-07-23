@@ -2,6 +2,7 @@
 
 import os
 import sys
+import subprocess
 
 _program_name = None
 
@@ -38,4 +39,19 @@ class Support:
 
     MASK=mask(4)
 
+def call(cmd):
+    return subprocess.check_call(cmd)
+    # TODO: make this work
+    # proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # out = ''
+    # ex = ''
+    # while not proc.poll():
+    #     for line in proc.stderr:
+    #         sys.stderr.write(line)
+    #         err += line
+    #     for line in proc.stdout:
+    #         sys.stdout.write(line)
+    #         out += line
+    # ex = proc.returncode
+    # return ex, out, err
 

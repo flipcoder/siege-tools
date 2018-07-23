@@ -5,10 +5,11 @@ import sgmake
 from common import Status
 from common import Settings
 from common import Support
+from common import call
 
 def make(project):
     try:
-        subprocess.check_call(['./configure', '--prefix=/usr'])
+        call(['./configure', '--prefix=/usr'])
     except subprocess.CalledProcessError:
         return Status.FAILURE
     return Status.SUCCESS

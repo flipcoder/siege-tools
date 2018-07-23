@@ -6,6 +6,7 @@ from common import Support
 from common import Settings
 from common.Plugin import Plugin
 import subprocess
+from common import call
 
 def make(project):
 
@@ -15,7 +16,7 @@ def make(project):
     ]
     
     try:
-        subprocess.check_call(cmd)
+        call(cmd)
     except subprocess.CalledProcessError:
         return Status.FAILURE
 

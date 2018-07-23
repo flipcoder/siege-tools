@@ -5,6 +5,7 @@ import subprocess
 from common import Status
 from common import Settings
 from common import Support
+from common import call
 
 def make(project):
     try:
@@ -22,7 +23,7 @@ def make(project):
             "-c", "Gruntfile.ls"
         ]
         try:
-            subprocess.check_call(lscmd)
+            call(lscmd)
         except subprocess.CalledProcessError:
             return Status.FAILURE
 
@@ -39,7 +40,7 @@ def make(project):
     #print " ".join(cmdline)
 
     try:
-        subprocess.check_call(cmdline)
+        call(cmdline)
     except subprocess.CalledProcessError:
         return Status.FAILURE
 

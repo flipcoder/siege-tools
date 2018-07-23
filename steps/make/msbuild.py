@@ -10,6 +10,7 @@ from common import Settings
 from common import Support
 from common import Args
 from common.Plugin import Plugin
+from common import call
 
 def make(project):
 
@@ -35,7 +36,7 @@ def make(project):
         pass
     
     try:
-        subprocess.check_call(cmdline)
+        call(cmdline)
     except subprocess.CalledProcessError:
         try:
             if project.build_dir:

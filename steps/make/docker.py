@@ -5,6 +5,7 @@ import subprocess
 from common import Status
 from common import Settings
 from common import Support
+from common import call
 
 def make(project):
     try:
@@ -27,7 +28,7 @@ def make(project):
     ]
 
     #try:
-    #    subprocess.check_call(os.path.join(project.dockerpath,"docker"), stdout=None, stderr=None)
+    #    call(os.path.join(project.dockerpath,"docker"), stdout=None, stderr=None)
     #except subprocess.CalledProcessError:
     #    pass
 
@@ -38,7 +39,7 @@ def make(project):
     #project.event("status", "preauth")
     
     try:
-        subprocess.check_call(cmdline)
+        call(cmdline)
     except subprocess.CalledProcessError:
         return Status.FAILURE
 

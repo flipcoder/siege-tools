@@ -6,11 +6,12 @@ from common import Status
 from common import Settings
 from common import Support
 from common.Plugin import Plugin
+from common import call
 import clean.clean
 
 def make(project):
     try:
-        subprocess.check_call(['./autogen.sh'])
+        call(['./autogen.sh'])
     except subprocess.CalledProcessError:
         return Status.FAILURE
     return Status.SUCCESS

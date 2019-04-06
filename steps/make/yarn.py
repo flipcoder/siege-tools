@@ -10,11 +10,11 @@ from common import call
 
 def make(project):
     try:
-        project.npmpath = os.path.abspath(os.path.expanduser(Settings.get('npm_path')))
+        project.yarnpath = os.path.abspath(os.path.expanduser(Settings.get('yarn_path')))
     except:
-        project.npmpath = ""
+        project.yarnpath = ""
 
-    cmdline = [os.path.join(project.npmpath,"yarn")]
+    cmdline = [os.path.join(project.yarnpath,"yarn")]
 
     try:
         call(cmdline)

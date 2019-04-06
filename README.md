@@ -46,6 +46,7 @@ Siege-tools builds makefile-projects significantly faster than the naive "make" 
 - Qt qmake
 - Mono xbuild
 - Node.js npm packages
+- Yarn packages
 - Bower packages
 - Docker dockerfiles
 - Grunt (Javascript Task Runner)

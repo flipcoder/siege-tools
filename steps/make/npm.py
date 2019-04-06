@@ -2,6 +2,7 @@
 import os
 import sgmake
 import subprocess
+import json
 from common import Status
 from common import Settings
 from common import Support
@@ -66,6 +67,10 @@ def compatible(project):
     if os.path.isfile("package.json") or \
         os.path.isfile("package.json.ls") or \
         os.path.isfile("package.lson"):
-        support |= Support.PROJECT
+            
+        with open('package.json') as f:
+            j = json.load(f)
+            if not (u'engines' in j and u'yarn' in j[u'engines'].keys()):
+                support |= Support.PROJECT
     return support
 

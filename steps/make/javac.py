@@ -8,16 +8,17 @@ from common.Plugin import Plugin
 import steps
 import sign.jarsigner
 
+
 def make(project):
 
-    for folder in (project.classdir,project.output_path):
+    for folder in (project.classdir, project.output_path):
         try:
             os.mkdir(os.path.join(os.getcwd(), folder))
         except OSError:
             pass
 
     classpath = ""
-    #classpathlist = os.pathsep.join(project.classpath)
+    # classpathlist = os.pathsep.join(project.classpath)
 
     for entry in project.classpath:
         if os.path.isfile(entry):
@@ -29,12 +30,14 @@ def make(project):
         for (path, dirs, files) in os.walk(os.path.join(os.getcwd(), entry)):
             for fn in files:
                 if fn.lower().endswith(".jar"):
-                    rel_path = os.path.relpath(path,fn)
-                    rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
+                    rel_path = os.path.relpath(path, fn)
+                    rel_path = rel_path[len(os.pardir) + len(os.sep) : len(rel_path)]
                     if classpath:
-                        classpath = os.pathsep.join((classpath, os.path.join(rel_path,fn)))
+                        classpath = os.pathsep.join(
+                            (classpath, os.path.join(rel_path, fn))
+                        )
                     else:
-                        classpath = os.path.join(rel_path,fn)
+                        classpath = os.path.join(rel_path, fn)
 
     if classpath:
         classpath = os.pathsep.join((classpath, os.pathsep.join(project.classpath)))
@@ -46,56 +49,98 @@ def make(project):
     for entry in project.sourcepath:
         if os.path.isfile(entry):
             if sourcepath:
-                sourcepath = sourcepath + os.linesep + os.path.join(rel_path,fn)
+                sourcepath = sourcepath + os.linesep + os.path.join(rel_path, fn)
             else:
-                sourcepath = os.path.join(rel_path,fn)
+                sourcepath = os.path.join(rel_path, fn)
             continue
         for (path, dirs, files) in os.walk(os.path.join(os.getcwd(), entry)):
             for fn in files:
                 for ext in project.src_ext:
                     if fn.lower().endswith(".%s" % ext):
-                        rel_path = os.path.relpath(path,fn)
-                        rel_path = rel_path[len(os.pardir) + len(os.sep):len(rel_path)]
+                        rel_path = os.path.relpath(path, fn)
+                        rel_path = rel_path[
+                            len(os.pardir) + len(os.sep) : len(rel_path)
+                        ]
                         if sourcepath:
-                            sourcepath = "%s %s" % (sourcepath, os.path.join(rel_path,fn))
+                            sourcepath = "%s %s" % (
+                                sourcepath,
+                                os.path.join(rel_path, fn),
+                            )
                         else:
-                            sourcepath = os.path.join(rel_path,fn)
+                            sourcepath = os.path.join(rel_path, fn)
 
-    project.javapath = Settings.get('java_path')
+    project.javapath = Settings.get("java_path")
     if project.javapath:
         project.javapath = os.path.abspath(project.javapath)
     else:
         project.javapath = ""
 
-    #if project.javapath:
+    # if project.javapath:
     #    if project.javapath[-1] != os.sep and os.altsep and Settings.get('java_path')[-1] != os.altsep:
     #        project.javapath += os.sep
-    #else:
+    # else:
     #    project.javapath = ""
 
-    project.output = os.path.join(project.output_path,project.name+".jar")
+    project.output = os.path.join(project.output_path, project.name + ".jar")
 
     # TODO: boostrap class path
-    # removed: -source 1.6 -target 1.6 
+    # removed: -source 1.6 -target 1.6
     misc_params = " ".join(project.javac_params)
-    os.system("%s %s -d %s %s -cp %s" % (os.path.join(project.javapath,"javac"), misc_params, project.classdir, sourcepath, classpath))
-    os.system("%s cmf %s %s -C %s ." % (os.path.join(project.javapath,"jar"), project.manifest, project.output, project.classdir))
+    print(
+        "%s %s -d %s %s -cp %s"
+        % (
+            os.path.join(project.javapath, "javac"),
+            misc_params,
+            project.classdir,
+            sourcepath,
+            classpath,
+        )
+    )
+    os.system(
+        "%s %s -d %s %s -cp %s"
+        % (
+            os.path.join(project.javapath, "javac"),
+            misc_params,
+            project.classdir,
+            sourcepath,
+            classpath,
+        )
+    )
+    print(
+        "%s cmf %s %s -C %s ."
+        % (
+            os.path.join(project.javapath, "jar"),
+            project.manifest,
+            project.output,
+            project.classdir,
+        )
+    )
+    os.system(
+        "%s cmf %s %s -C %s ."
+        % (
+            os.path.join(project.javapath, "jar"),
+            project.manifest,
+            project.output,
+            project.classdir,
+        )
+    )
     # TODO wrap stdout from above commands and detect errors
-    
+
     if not os.path.isfile(project.output):
         return Status.FAILURE
 
     return Status.SUCCESS
 
+
 def set_defaults(project):
     try:
         if not project.sourcepath:
             project.sourcepath = ["src"]
-    except:
+    except AttributeError:
         project.sourcepath = ["src"]
     try:
         project.sourcepath.extend(project.sourcepath_append)
-    except:
+    except AttributeError:
         pass
 
     project.obfuscator = None
@@ -104,16 +149,16 @@ def set_defaults(project):
     project.classdir = "bin"
     try:
         project.output_path
-    except:
+    except AttributeError:
         project.output_path = "dist"
 
     try:
         project.classpath
-    except:
-        project.classpath = ["lib","libs"]
+    except AttributeError:
+        project.classpath = ["lib", "libs"]
     try:
         project.classpath.extend(project.classpath_append)
-    except:
+    except AttributeError:
         pass
 
     project.language = "java"
@@ -121,14 +166,21 @@ def set_defaults(project):
     # TODO if no manifest, auto-generate (?)
     #  note: first, make sure theres another entry path into this method
     #  (only one is by detecting a manifest)
-    project.javac_params = ["-Xlint:unchecked"]
+    try:
+        project.javac_params
+    except AttributeError:
+        project.javac_params = []
 
     # TODO list dirs to clean (so clean step can find them), and add clean step
     project.clean = []
 
+
 def update(project):
-    project.clean += ["%s/%s.jar" % (project.output_path, project.name) , "%s/**.class" % project.classdir]
-    #project.steps = [Plugin("steps","clean","clean")] + project.steps
+    project.clean += [
+        "%s/%s.jar" % (project.output_path, project.name),
+        "%s/**.class" % project.classdir,
+    ]
+    # project.steps = [Plugin("steps","clean","clean")] + project.steps
 
     added = False
 
@@ -139,7 +191,7 @@ def update(project):
         i = 0
         for s in project.steps:
             if s.type == "obfuscate":
-                project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
+                project.steps.insert(i + 1, Plugin("steps", "sign", "jarsigner"))
                 added = True
             i += 1
 
@@ -147,17 +199,17 @@ def update(project):
             i = 0
             for s in project.steps:
                 if s.type == "make" and s.name == "javac":
-                    project.steps.insert(i+1, Plugin("steps", "sign", "jarsigner"))
+                    project.steps.insert(i + 1, Plugin("steps", "sign", "jarsigner"))
                     added = True
                 i += 1
-              
+
 
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    
+
     # TODO turn this into a detect
     for fn in os.listdir(os.getcwd()):
-        if os.path.isfile(os.path.join(os.getcwd(),fn)):
+        if os.path.isfile(os.path.join(os.getcwd(), fn)):
             if fn.lower().endswith(".mf"):
                 project.manifest = os.path.join(os.getcwd(), fn)
                 set_defaults(project)
@@ -165,4 +217,3 @@ def compatible(project):
                 break
 
     return support
-

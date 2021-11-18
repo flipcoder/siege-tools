@@ -2,25 +2,34 @@ import os
 import sgmake
 from common import *
 
+
 def package(project):
     wdir = os.getcwd()
     os.chdir(os.path.join(wdir, os.path.dirname(project.izpack_file)))
 
     try:
-        os.system("%s %s" % (os.path.join(project.izpack_dir, project.izpack_binary), os.path.basename(project.izpack_file)))
+        os.system(
+            "%s %s"
+            % (
+                os.path.join(project.izpack_dir, project.izpack_binary),
+                os.path.basename(project.izpack_file),
+            )
+        )
     except:
         pass
 
     os.chdir(wdir)
     return Status.SUCCESS
 
+
 def update(project):
-    #project.clean_commands += ["install.jar"] # requires clean as a step
+    # project.clean_commands += ["install.jar"] # requires clean as a step
     pass
+
 
 def compatible(project):
     support = Support.AUTO | Support.ENVIRONMENT
-    
+
     for fn in ("izpack.xml", "izpack%sizpack.xml" % os.sep):
         if os.path.isfile(os.path.join(os.getcwd(), fn)):
             project.izpack_file = fn
@@ -36,6 +45,5 @@ def compatible(project):
             project.izpack_binary = "compile.bat"
         else:
             project.izpack_binary = "compile"
-    
-    return support
 
+    return support

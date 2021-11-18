@@ -7,37 +7,40 @@ from common import Settings
 from common import Support
 from common import call
 
+
 def make(project):
     try:
-        project.dockerpath = os.path.abspath(os.path.expanduser(Settings.get('docker_path')))
+        project.dockerpath = os.path.abspath(
+            os.path.expanduser(Settings.get("docker_path"))
+        )
     except:
         project.dockerpath = ""
-    
-    #try:
+
+    # try:
     #    project.sudocmd = os.path.abspath(os.path.expanduser(Settings.get('sudo_command')))
-    #except:
+    # except:
     #    project.sudo_command = "sudo"
 
     cmdline = [
-        os.path.join(project.dockerpath,"docker"),
+        os.path.join(project.dockerpath, "docker"),
         "-D=true",
         "build",
         "--no-cache",
-        "-t=%s"%project.name,
+        "-t=%s" % project.name,
         ".",
     ]
 
-    #try:
+    # try:
     #    call(os.path.join(project.dockerpath,"docker"), stdout=None, stderr=None)
-    #except subprocess.CalledProcessError:
+    # except subprocess.CalledProcessError:
     #    pass
 
     # TODO: only do this next block if current user is not part of docker group
-    #  or is not root 
-    #print "Docker needs root permissions (C-c to cancel)"
-    #cmdline = [project.sudo_command] + cmdline
-    #project.event("status", "preauth")
-    
+    #  or is not root
+    # print("Docker needs root permissions (C-c to cancel)")
+    # cmdline = [project.sudo_command] + cmdline
+    # project.event("status", "preauth")
+
     try:
         call(cmdline)
     except subprocess.CalledProcessError:
@@ -45,9 +48,9 @@ def make(project):
 
     return Status.SUCCESS
 
+
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     if os.path.isfile("Dockerfile"):
         support |= Support.PROJECT
     return support
-

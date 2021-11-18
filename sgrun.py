@@ -1,6 +1,7 @@
-#!/usr/bin/env python2
-import os,sys,re,subprocess,json
+#!/usr/bin/env python3
+import os, sys, re, subprocess, json
 from backports.shutil_which import which
+
 prefix = []
 exes = []
 cwd = "."
@@ -11,9 +12,12 @@ args = sys.argv[1:]
 if not args:
     args = []
 
+
 def path_equals(a, b):
-    return os.path.normpath(os.path.expanduser(a)) == \
-        os.path.normpath(os.path.expanduser(b))
+    return os.path.normpath(os.path.expanduser(a)) == os.path.normpath(
+        os.path.expanduser(b)
+    )
+
 
 def run():
     global args
@@ -23,39 +27,40 @@ def run():
 
     optional_prefix = False
     for arg in args:
-        if arg.startswith('---p='):
-            arg = arg[len('---p='):]
-            prefix += arg.split(',')
+        if arg.startswith("---p="):
+            arg = arg[len("---p=") :]
+            prefix += arg.split(",")
             break
-        if arg.startswith('---op='):
-            arg = arg[len('---op='):]
-            prefix += arg.split(',')
+        if arg.startswith("---op="):
+            arg = arg[len("---op=") :]
+            prefix += arg.split(",")
             break
 
     if prefix and not optional_prefix and not which(prefix[0]):
-        print >> sys.stderr, "prefix not found"
+        print("prefix not found")
         return 1
 
     if "---l" in args:
-        print os.path.join(cwd,exes[0])
+        print(os.path.join(cwd, exes[0]))
         return 0
     elif "---d" in args:
-        print os.path.dirname(cwd)
+        print(os.path.dirname(cwd))
         return 0
     else:
         args = [a for a in args if not a.startswith("---")]
         try:
-            with open(os.path.join(cwd, os.path.dirname(exes[0]), "sg.json"), 'r') as f:
+            with open(os.path.join(cwd, os.path.dirname(exes[0]), "sg.json"), "r") as f:
                 j = json.load(f)
-                args += j['args']
+                args += j["args"]
         except:
             pass
-        
-        if os.name=="nt":
-            r = subprocess.call(prefix + [os.path.join(cwd,exes[0])] + args, cwd=(cwd))
+
+        if os.name == "nt":
+            r = subprocess.call(prefix + [os.path.join(cwd, exes[0])] + args, cwd=(cwd))
         else:
-            r = subprocess.call(prefix + ['./'+exes[0]] + args, cwd=(cwd))
+            r = subprocess.call(prefix + ["./" + exes[0]] + args, cwd=(cwd))
     return r
+
 
 def advanced():
     global exes
@@ -78,6 +83,7 @@ def advanced():
     # TODO: plugin: package.json
     try:
         import json
+
         with open("package.json") as f:
             j = json.load(f)
             exe = j["main"] + ".js"
@@ -110,10 +116,10 @@ def advanced():
                     else:
                         exes = [fn]
                         break
-                
+
                     fn_noext = fn[:-3]
                     fn_noext_l = fn_noext.lower()
-                    if fn_noext_l == "main" or  fnl_noext_l == foldername:
+                    if fn_noext_l == "main" or fnl_noext_l == foldername:
                         if os.name == "nt":
                             exes = ["python"]
                             args = [fn] + args
@@ -122,7 +128,6 @@ def advanced():
                             exes = [fn]
                             break
         break
-
 
     # TODO: plugin: expression match
     while True:
@@ -142,28 +147,28 @@ def advanced():
         if idx == -1:
             break
         try:
-            expr = args[idx+1]
+            expr = args[idx + 1]
         except:
-            print >> sys.stderr, "---e flag needs expression param"
+            print("---e flag needs expression param")
             return 1
 
-        del args[idx+1]
+        del args[idx + 1]
         del args[idx]
         if not use_regex:
             if expr not in exes:
-                print >> sys.stderr, "\"%s\" does not exist" % expr
+                print('"%s" does not exist' % expr)
                 return 1
             exes = [expr]
             return run()
-        else: # regex
+        else:  # regex
             exes = [e for e in exes if re.search(expr, e)]
             if exes:
                 return advanced()
             else:
-                print >> sys.stderr, "No executables matching expression"
+                print("No executables matching expression")
                 return 1
         break
-    
+
     # plugin: ignore tests
     if len(exes) > 1:
         exes_old = exes[:]
@@ -173,23 +178,27 @@ def advanced():
         else:
             # restore and continue
             exes = exes_old
-    
+
     if len(exes) > 1:
-        print >> sys.stderr, 'Found %s executables: %s' % (len(exes), ', '.join(exes))
-        print >> sys.stderr, "Too many executables"
+        print("Found %s executables: %s" % (len(exes), ", ".join(exes)))
+        print("Too many executables")
     elif len(exes) == 0:
-        print >> sys.stderr, "No executables"
+        print("No executables")
     return 1
-    
-class Break(Exception): pass
+
+
+class Break(Exception):
+    pass
+
 
 def exe(fn):
     if os.path.isdir(fn):
         return False
-    if os.name=='nt':
+    if os.name == "nt":
         return fn.lower().endswith(".exe")
     else:
         return os.access(fn, os.X_OK)
+
 
 p = os.path.abspath(".")
 try:
@@ -213,7 +222,9 @@ try:
                     exes += [f]
                     fnp = os.path.basename(os.getcwd())
                     if fnp == "bin":
-                        fnp = os.path.basename(os.path.abspath(os.path.join(os.getcwd(), "..")))
+                        fnp = os.path.basename(
+                            os.path.abspath(os.path.join(os.getcwd(), ".."))
+                        )
                     foldername = os.path.join(os.path.basename(fnp))
             if exes:
                 raise Break
@@ -221,10 +232,9 @@ try:
             pass
 
         p = os.path.abspath(os.path.join(p, ".."))
-        if p == "/" or path_equals(p,"~") or path_equals(p,"~/bin"):
+        if p == "/" or path_equals(p, "~") or path_equals(p, "~/bin"):
             break
 except Break:
     pass
 
 exit(advanced())
-

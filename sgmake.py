@@ -1,8 +1,8 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 """
 Siege-Tools SiegeMake (\"sgmake\")
 Universal Plug-in-Based Build Automation
-Version 0.9.5
+Version 0.9.6
 Copyright (c) 2013 Grady O'Connell
 """
 
@@ -16,83 +16,89 @@ import steps
 import events
 import json
 
+
 def splash():
-    print __doc__.strip()
+    print(__doc__.strip())
+
 
 def commands():
     print("Commands: %s" % ", ".join(Args.valid_commands))
+
 
 def help():
     splash()
     print()
     commands()
 
+
 def confirm(question, default="y"):
     default = default.lower()
-    if default=="y":
-        options="Y/n"
+    if default == "y":
+        options = "Y/n"
     else:
-        options="y/N"
+        options = "y/N"
     # TODO: make this a single character read (no endline)
     choice = raw_input("%s (%s)? " % (question, options))
     choice = choice.lower()
     if choice == "":
         choice = default
-    return choice=="y"
+    return choice == "y"
+
 
 class Project(object):
-
     def __init__(self):
         self.status = Status.UNSET
         self.steps = []
         if not self.run_user_config("sg.json"):
             self.run_user_script("sg.py")
         self.back_up_env = os.environ
-        
+
         try:
-            if 'env' in self.options:
-                for k,v in env:
+            if "env" in self.options:
+                for k, v in env:
                     os.environ[k] = v
         except AttributeError:
             pass
 
     def run_user_config(self, cfg):
         for fn in os.listdir("."):
-            if fn.lower()==cfg  and os.path.isfile(os.path.join(os.getcwd(), fn)):
+            if fn.lower() == cfg and os.path.isfile(os.path.join(os.getcwd(), fn)):
                 config = json.load(open(cfg))
-                self.__dict__.update(config.get("options",{}))
+                self.__dict__.update(config.get("options", {}))
                 return True
         return False
-    
+
     def run_user_script(self, script):
         ## Project config
         for fn in os.listdir("."):
-            if fn.lower()==script and os.path.isfile(os.path.join(os.getcwd(), fn)):
-                #if not Args.option("warn") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
+            if fn.lower() == script and os.path.isfile(os.path.join(os.getcwd(), fn)):
+                # if not Args.option("warn") or confirm("Run potentially insecure python script \"%s\"" % fn, "y"):
                 with open(fn) as source:
-                    eval(compile(source.read(), fn, 'exec'), {}, self.__dict__)
-                #else:
+                    eval(compile(source.read(), fn, "exec"), {}, self.__dict__)
+                # else:
                 #    sys.exit(1)
-    
+
     def complete(self):
-        #if not self.run_user_config("sg.json"):
+        # if not self.run_user_config("sg.json"):
         #    self.run_user_script("sg.py")
 
         # update all plugins after script runs
-        steps = self.steps[:] # update may modify during iteration
+        steps = self.steps[:]  # update may modify during iteration
         for step in steps:
             step.call("update", self)
-            #steps.update(step.type(), step.name(), self)
+            # steps.update(step.type(), step.name(), self)
 
         i = 1
         self.event("status", "step_start")
         for step in self.steps:
-            step_type = step.type[0].upper() + step.type[1:] # capitalize step name
-            print "%s step (plug-in: %s)..." % (step_type,  step.name)
+            step_type = step.type[0].upper() + step.type[1:]  # capitalize step name
+            print("%s step (plug-in: %s)..." % (step_type, step.name))
             i += 1
-            #status = getattr(self, step)()
-            status = step.call(step.type, self) # example: install plugins call install() method
-            #status = steps.step(step.type, step.name, self)
+            # status = getattr(self, step)()
+            status = step.call(
+                step.type, self
+            )  # example: install plugins call install() method
+            # status = steps.step(step.type, step.name, self)
             if status == Status.SUCCESS:
                 self.event("status", "step_success")
             #    #print("...%s finished." % step_name)
@@ -115,6 +121,7 @@ class Project(object):
             pass
         return r
 
+
 def event(plugin_type, args):
     r = []
     try:
@@ -125,12 +132,13 @@ def event(plugin_type, args):
         pass
     return r
 
+
 def detect_project():
     """
     Detects the projects build steps and checks for step support
     """
 
-    #for plugin in steps.base.values():
+    # for plugin in steps.base.values():
     #    try:
     #        if plugin.Project.compatible():
     #            return plugin.Project()
@@ -141,20 +149,20 @@ def detect_project():
 
     # Run all detection steps
     for plugin in steps.steps["detect"]:
-        if not Plugin("steps", "detect", plugin).call("detect",project):
+        if not Plugin("steps", "detect", plugin).call("detect", project):
             return None
-        #if not steps.step("detect", plugin, project):
+        # if not steps.step("detect", plugin, project):
 
     # Add required steps to project
     for plugin_type in steps.steps.iterkeys():
         if plugin_type == "detect":
             continue
         for plugin in steps.steps[plugin_type]:
-            #if steps.compatible(plugin_type, plugin, project) & Support.MASK == Support.MASK:
+            # if steps.compatible(plugin_type, plugin, project) & Support.MASK == Support.MASK:
             plugin = Plugin("steps", plugin_type, plugin)
             if plugin.call("compatible", project) == Support.MASK:
                 project.steps += [plugin]
-        
+
     project.events = {}
     for plugin_type in events.events.iterkeys():
         project.events[plugin_type] = []
@@ -166,9 +174,10 @@ def detect_project():
     # check if project meets standards for a sgmake project
     if is_project(project):
         return project
-    
+
     # otherwise, no project detected
     return None
+
 
 # minimum requirements for a project
 def is_project(project):
@@ -176,7 +185,7 @@ def is_project(project):
     Checks if a project meets the minimum step standards
     """
     for step in project.steps:
-        if step.type in ("make","package"): # at least one make or package step
+        if step.type in ("make", "package"):  # at least one make or package step
             return True
     return False
 
@@ -189,7 +198,7 @@ def try_project(fn):
     # save previous dir so we can pop back into it
     wdir = os.getcwd()
 
-    if fn.startswith(".") and fn != "." and fn != "..": # check if path is hidden
+    if fn.startswith(".") and fn != "." and fn != "..":  # check if path is hidden
         return 0
     if not os.path.isdir(os.path.join(fn)):
         return 0
@@ -202,7 +211,7 @@ def try_project(fn):
 
     listed = False
     if project and not project.status == Status.UNSUPPORTED:
-        print "%s (%s)" % (project.name, os.path.relpath(os.getcwd(), wdir))
+        print("%s (%s)" % (project.name, os.path.relpath(os.getcwd(), wdir)))
         listed = True
 
     if Args.anywhere("list"):
@@ -222,13 +231,25 @@ def try_project(fn):
 
 
 def main():
-    Args.valid_options = ["clean", "list", "debug", "version", "verbose", "strict", "warn", "recursive", "reversive", "execute", "x"] #, "interactive", "cache"
+    Args.valid_options = [
+        "clean",
+        "list",
+        "debug",
+        "version",
+        "verbose",
+        "strict",
+        "warn",
+        "recursive",
+        "reversive",
+        "execute",
+        "x",
+    ]  # , "interactive", "cache"
     Args.valid_keys = ["ignore"]
     Args.process()
 
     # process the build step plugins
     try:
-        steps.ignore(Args.value("ignore").split(",")) # disable requested steps
+        steps.ignore(Args.value("ignore").split(","))  # disable requested steps
     except AttributeError:
         pass
     steps.process()
@@ -240,7 +261,7 @@ def main():
     if Args.option("help") or Args.option("?"):
         help()
         return 0
-    
+
     # count of projects succeeded and failed
     success_count = 0
     failed_count = 0
@@ -252,9 +273,9 @@ def main():
     # check for forward recusion and backward scan settings
     recursive = Args.option("recursive")
     reversive = True
-    #reversive = Args.option("reversive")
+    # reversive = Args.option("reversive")
     execute = Args.option("x") or Args.option("execute")
-    
+
     event("status", "start")
 
     if recursive:
@@ -267,11 +288,11 @@ def main():
             for root, dirs, files in os.walk(fn):
                 stop_recurse = False
                 for d in dirs:
-                    base =  os.path.basename(os.path.join(root,d))
+                    base = os.path.basename(os.path.join(root, d))
                     if base.startswith(".") and base != ".":
                         continue
 
-                    #print os.path.normpath(os.path.join(root,d))
+                    # print(os.path.normpath(os.path.join(root,d)))
                     r = try_project(os.path.normpath(os.path.join(root, d)))
                     if r == 1:
                         if not Args.option("list"):
@@ -282,16 +303,16 @@ def main():
                             failed_count += 1
                 if stop_recurse:
                     dirs[:] = []
-                
+
     elif reversive:
         # TODO search for project by iterating dirs backwards
         # To be used build a sgmake project from within a nested directory or source editor
 
         for fn in Args.filenames:
             path = os.path.abspath(os.path.join(os.getcwd(), fn))
-            
-            while os.path.realpath(path) != os.path.expanduser('~'):
-            #while os.path.realpath(path) != os.path.realpath(os.path.join(path, "..")): # is root
+
+            while os.path.realpath(path) != os.path.expanduser("~"):
+                # while os.path.realpath(path) != os.path.realpath(os.path.join(path, "..")): # is root
 
                 r = try_project(os.path.normpath(path))
                 if r == 1:
@@ -304,8 +325,8 @@ def main():
                     break
 
                 path = os.path.realpath(os.path.join(path, ".."))
-            #print "done: %s" % path
-    #else:
+            # print("done: %s" % path)
+    # else:
     #    # try to build projects specified by the user, current dir is default
     #    for fn in Args.filenames:
     #        r = try_project(os.path.join(os.getcwd(),fn))
@@ -314,10 +335,9 @@ def main():
     #        elif r == -1:
     #            failed_count += 1
 
-
     if not Args.command("list"):
         # if not in list-only mode, display final status of built projects
-        
+
         if success_count:
             print("%s project(s) completed." % success_count)
             if not failed_count:
@@ -333,9 +353,9 @@ def main():
             event("status", "nothing")
             print("Nothing to be done.")
             return 1
-    
+
     return 0
+
 
 if __name__ == "__main__":
     exit(main())
-

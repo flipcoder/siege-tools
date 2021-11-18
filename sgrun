@@ -1,2 +1,2 @@
 #!/bin/bash
-python2 `dirname $0`/sgrun.py "$*"
+python3 `dirname $0`/sgrun.py "$*"

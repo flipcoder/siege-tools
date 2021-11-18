@@ -8,13 +8,11 @@ from common.Plugin import Plugin
 import subprocess
 from common import call
 
+
 def make(project):
 
-    cmd = [
-        'xbuild',
-        project.solution
-    ]
-    
+    cmd = ["xbuild", project.solution]
+
     try:
         call(cmd)
     except subprocess.CalledProcessError:
@@ -22,24 +20,26 @@ def make(project):
 
     return Status.SUCCESS
 
+
 def update(project):
     # TODO: add exe's in all bin/ folders to be cleaned
     pass
-    
+
+
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
     # TODO: check env support: do we have xbuild on the system?
-    
+
     # TODO turn this into a detect
     for fn in os.listdir(os.getcwd()):
-        if os.path.isfile(os.path.join(os.getcwd(),fn)):
+        if os.path.isfile(os.path.join(os.getcwd(), fn)):
             if fn.lower().endswith(".sln"):
                 sln = os.path.join(os.getcwd(), fn)
-                f = open(sln, 'r')
+                f = open(sln, "r")
                 has_csharp = False
                 for line in f:
-                    if line.startswith('Project('):
-                        if line.find(".csproj")!=-1:
+                    if line.startswith("Project("):
+                        if line.find(".csproj") != -1:
                             has_csharp = True
                 f.close()
                 if has_csharp:
@@ -49,4 +49,3 @@ def compatible(project):
                 break
 
     return support
-

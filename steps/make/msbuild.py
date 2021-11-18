@@ -12,16 +12,19 @@ from common import Args
 from common.Plugin import Plugin
 from common import call
 
+
 def make(project):
 
     try:
-        project.makepath = os.path.abspath(os.path.expanduser(Settings.get('make_path')))
+        project.makepath = os.path.abspath(
+            os.path.expanduser(Settings.get("make_path"))
+        )
     except:
         project.makepath = ""
 
     # TODO: detect a suitable vcvars if the environment isn't init
 
-    cmdline = [os.path.join(project.makepath,"msbuild")]
+    cmdline = [os.path.join(project.makepath, "msbuild")]
     cmdline += ["/p:Platform=Win32"]
     if Args.option("debug"):
         cmdline += ["/p:Configuration=Debug"]
@@ -34,7 +37,7 @@ def make(project):
         os.chdir(project.build_dir)
     except:
         pass
-    
+
     try:
         call(cmdline)
     except subprocess.CalledProcessError:
@@ -44,7 +47,7 @@ def make(project):
         except:
             pass
         return Status.FAILURE
-    
+
     try:
         if project.build_dir:
             os.chdir("..")
@@ -53,8 +56,9 @@ def make(project):
 
     return Status.SUCCESS
 
+
 def update(project):
-    
+
     # msbuild overrides makefile steps, since makefile is probably posix only
     make_step = Plugin("steps", "make", "makefile")
     if make_step in project.steps:
@@ -71,31 +75,30 @@ def update(project):
     projname = ""
     projs = 0
     for fn in os.listdir(os.getcwd()):
-        if os.path.isfile(os.path.join(os.getcwd(),fn)):
+        if os.path.isfile(os.path.join(os.getcwd(), fn)):
             fnl = fn.lower()
             if fnl.endswith(".sln"):
                 projname = os.path.join(os.getcwd(), fn)
                 projs += 1
                 break
-    
+
     if projs > 1:
-        project.msbuild_params += [project.name+".sln"]
+        project.msbuild_params += [project.name + ".sln"]
     else:
         project.msbuild_params += [projname]
 
 
 def compatible(project):
     support = Support.USER
-    
+
     for fn in os.listdir(os.getcwd()):
-        if os.path.isfile(os.path.join(os.getcwd(),fn)):
+        if os.path.isfile(os.path.join(os.getcwd(), fn)):
             fnl = fn.lower()
             if fnl.endswith(".sln"):
                 support |= Support.PROJECT
                 support |= Support.AUTO
 
-    if os.name=="nt":
+    if os.name == "nt":
         support |= Support.ENVIRONMENT
-    
-    return support
 
+    return support

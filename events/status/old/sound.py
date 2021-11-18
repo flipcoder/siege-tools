@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from common import Status
 from common import Settings
 from common import Support
@@ -7,15 +7,16 @@ import time
 
 inited = False
 
+
 def status(project, args):
 
     try:
         import pygame
     except:
         return Status.SUCCESS
-    
+
     global inited
-    
+
     try:
         snd_path = "%s/sounds/%s.wav" % (os.path.split(__file__)[0], args)
         if os.path.exists(snd_path):
@@ -30,10 +31,10 @@ def status(project, args):
     except:
         return Status.SUCCESS
 
+
 def compatible(project):
     try:
         import pygame
     except ImportError:
         return Support.MASK & ~Support.ENVIRONMENT
     return Support.MASK
-

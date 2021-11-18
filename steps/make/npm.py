@@ -8,46 +8,43 @@ from common import Settings
 from common import Support
 from common import call
 
+
 def make(project):
     try:
-        project.npmpath = os.path.abspath(os.path.expanduser(Settings.get('npm_path')))
+        project.npmpath = os.path.abspath(os.path.expanduser(Settings.get("npm_path")))
     except:
         project.npmpath = ""
 
     if os.path.isfile("package.json.ls") or os.path.isfile("package.lson"):
-        
+
         try:
-            project.lscpath = os.path.abspath(os.path.expanduser(Settings.get('lsc_path')))
+            project.lscpath = os.path.abspath(
+                os.path.expanduser(Settings.get("lsc_path"))
+            )
         except:
             project.lscpath = ""
-        
-        if os.path.isfile("package.json.ls") :
-            lscmd = [
-                os.path.join(project.lscpath,"lsc"),
-                "-jc", "package.json.ls"
-            ]
+
+        if os.path.isfile("package.json.ls"):
+            lscmd = [os.path.join(project.lscpath, "lsc"), "-jc", "package.json.ls"]
         elif os.path.isfile("package.lson"):
-            
-            lscmd = [
-                os.path.join(project.lscpath,"lsc"),
-                "-jc", "package.lson"
-            ]
+
+            lscmd = [os.path.join(project.lscpath, "lsc"), "-jc", "package.lson"]
 
         try:
             call(lscmd)
         except subprocess.CalledProcessError:
             return Status.FAILURE
 
-    #try:
+    # try:
     #    project.npm_params
-    #except:
+    # except:
     #    project.npm_params = []
 
-    cmdline = [os.path.join(project.npmpath,"npm"), "install"]
-    #if project.npm_params:
+    cmdline = [os.path.join(project.npmpath, "npm"), "install"]
+    # if project.npm_params:
     #    cmdline += project.npm_params
 
-    #print " ".join(cmdline)
+    # print(" ".join(cmdline))
 
     try:
         call(cmdline)
@@ -56,21 +53,24 @@ def make(project):
 
     return Status.SUCCESS
 
-#def update(project):
-    #if os.path.isfile("package.json.ls") or os.path.isfile("package.lson"):
-    #    # remove temp generated package.json
-    #    project.clean += ['package.json']
-    #    pass
-    
+
+# def update(project):
+# if os.path.isfile("package.json.ls") or os.path.isfile("package.lson"):
+#    # remove temp generated package.json
+#    project.clean += ['package.json']
+#    pass
+
+
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    if os.path.isfile("package.json") or \
-        os.path.isfile("package.json.ls") or \
-        os.path.isfile("package.lson"):
-            
-        with open('package.json') as f:
+    if (
+        os.path.isfile("package.json")
+        or os.path.isfile("package.json.ls")
+        or os.path.isfile("package.lson")
+    ):
+
+        with open("package.json") as f:
             j = json.load(f)
-            if not (u'engines' in j and u'yarn' in j[u'engines'].keys()):
+            if not (u"engines" in j and u"yarn" in j[u"engines"].keys()):
                 support |= Support.PROJECT
     return support
-

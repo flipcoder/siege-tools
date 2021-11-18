@@ -7,37 +7,38 @@ from common import Settings
 from common import Support
 from common import call
 
+
 def make(project):
     try:
-        project.gruntpath = os.path.abspath(os.path.expanduser(Settings.get('grunt_path')))
+        project.gruntpath = os.path.abspath(
+            os.path.expanduser(Settings.get("grunt_path"))
+        )
     except:
         project.gruntpath = ""
 
     if os.path.isfile("Gruntfile.ls"):
         try:
-            project.lscpath = os.path.abspath(os.path.expanduser(Settings.get('lsc_path')))
+            project.lscpath = os.path.abspath(
+                os.path.expanduser(Settings.get("lsc_path"))
+            )
         except:
             project.lscpath = ""
-        lscmd = [
-            os.path.join(project.lscpath,"lsc"),
-            "-c", "Gruntfile.ls"
-        ]
+        lscmd = [os.path.join(project.lscpath, "lsc"), "-c", "Gruntfile.ls"]
         try:
             call(lscmd)
         except subprocess.CalledProcessError:
             return Status.FAILURE
 
-
-    #try:
+    # try:
     #    project.grunt_params
-    #except:
+    # except:
     #    project.grunt_params = []
 
-    cmdline = [os.path.join(project.gruntpath,"grunt")]
-    #if project.grunt_params:
+    cmdline = [os.path.join(project.gruntpath, "grunt")]
+    # if project.grunt_params:
     #    cmdline += project.grunt_params
 
-    #print " ".join(cmdline)
+    # print(" ".join(cmdline))
 
     try:
         call(cmdline)
@@ -46,11 +47,13 @@ def make(project):
 
     return Status.SUCCESS
 
+
 def compatible(project):
     support = Support.ENVIRONMENT | Support.USER | Support.AUTO
-    if os.path.exists("Gruntfile.js") or\
-        os.path.exists("Gruntfile.coffee") or\
-        os.path.exists("Gruntfile.ls"):
+    if (
+        os.path.exists("Gruntfile.js")
+        or os.path.exists("Gruntfile.coffee")
+        or os.path.exists("Gruntfile.ls")
+    ):
         support |= Support.PROJECT
     return support
-

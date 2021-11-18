@@ -67,12 +67,12 @@ This is the best bet so you can keep the git repo current as I change things.
 
 Example:
 
-    alias sgmake="/usr/bin/env python2 ~/bin/siege-tools/sgmake.py"
+    alias sgmake="/usr/bin/env python3 ~/bin/siege-tools/sgmake.py"
 
 Or, make a new file /usr/bin/sgmake, with contents:
 
     #!/bin/bash
-    /usr/bin/env/python2 ~/bin/siege-tools/sgmake.py "$@"
+    /usr/bin/env/python3 ~/bin/siege-tools/sgmake.py "$@"
 
 (Use your own path to siege-tools)
 

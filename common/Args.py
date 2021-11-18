@@ -19,25 +19,30 @@ command_aliases = {}
 filenames = []
 allow_strings = False
 
+
 def option(s):
     if s in options:
         return True
     return False
+
 
 def value(s):
     if s in arg_map:
         return arg_map[s]
     return None
 
+
 def command(s):
     if s in commands:
         return True
     return False
 
+
 def anywhere(s):
     if s in commands or s in options:
         return True
     return False
+
 
 def process():
     global valid_commands
@@ -48,21 +53,21 @@ def process():
     valid_options = valid_anywhere + valid_options
 
     for arg in sys.argv[1:]:
-        #arg_case = arg
-        #arg = arg.lower()
+        # arg_case = arg
+        # arg = arg.lower()
         if arg.startswith("--"):
-            if '=' in arg:
+            if "=" in arg:
                 idx = arg.find("=")
                 key = arg[2:idx]
                 try:
-                    value = arg[idx+1:]
+                    value = arg[idx + 1 :]
                 except:
-                    print "No key specified for parameter \'%s\'" % arg
+                    print("No key specified for parameter '%s'" % arg)
                     exit(1)
-                    #break
-                    
+                    # break
+
                 if key not in valid_keys:
-                    print "Invalid key \'%s\'" % key
+                    print("Invalid key '%s'" % key)
                     exit(1)
 
                 if key not in arg_map:
@@ -70,25 +75,25 @@ def process():
             else:
                 entry = arg[2:]
                 if entry not in valid_options:
-                    print "Invalid parameter \'%s\'" % entry
+                    print("Invalid parameter '%s'" % entry)
                     exit(1)
                 elif entry not in options:
                     options.append(entry)
 
         elif arg.startswith("-"):
-        #    arg = arg[1:]
-        #    if arg in valid_options:
-        #        options.append(arg)
-        #    else:
+            #    arg = arg[1:]
+            #    if arg in valid_options:
+            #        options.append(arg)
+            #    else:
 
             letters = arg[1:]
-            if (len(letters) == 0):
-                print "Invalid paramter \'%s\'" % arg
+            if len(letters) == 0:
+                print("Invalid paramter '%s'" % arg)
                 exit(1)
 
             # if user passes something like -version, allow it as a normal parameter,
             # instead of each letter -v -e -r -s... etc.
-            #if letters in valid_anywhere:
+            # if letters in valid_anywhere:
             #    options.append(letters)
             #    continue
             if letters in valid_options:
@@ -110,7 +115,7 @@ def process():
                     elif ch == name[:1].upper():
                         # uses secondary match if the letter is capitalized
                         # example: -v matches version, -V matches verbose
-                        if num_matches > 0: 
+                        if num_matches > 0:
                             matched_arg = True
                             if name not in options:
                                 options.append(name)
@@ -118,7 +123,7 @@ def process():
                         num_matches += 1
 
                 if not matched_arg:
-                    print "Invalid parameter \'-%s\'" % ch
+                    print("Invalid parameter '-%s'" % ch)
                     exit(1)
 
         else:
@@ -126,11 +131,10 @@ def process():
             # no prefix dashes (-) on argument means its a command or  filename
 
             # TODO: add back in commands
-            #if arg in valid_commands:
+            # if arg in valid_commands:
             #    commands.append(arg);
-            #elif arg in command_aliases and command_aliases[arg] in valid_commands:
+            # elif arg in command_aliases and command_aliases[arg] in valid_commands:
             #    commands.append(command_aliases[arg])
-            #else:
-            #    print "Invalid command \'%s\'" % arg
+            # else:
+            #    print("Invalid command \'%s\'" % arg)
             #    exit(1)
-

@@ -12,4 +12,3 @@ It is enabled based on a combination of:
 
 # TODO: if event plug-in enabled by user's environment settings,
 # do check if $EDITOR == vim,  vim -c make! -c cwindow (?)
-

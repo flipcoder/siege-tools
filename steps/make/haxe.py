@@ -8,10 +8,11 @@ from common.Plugin import Plugin
 import subprocess
 from common import call
 
+
 def make(project):
 
-    cmd = [ 'haxe', 'compile.hxml' ]
-    
+    cmd = ["haxe", "compile.hxml"]
+
     try:
         call(cmd)
     except subprocess.CalledProcessError:
@@ -19,12 +20,13 @@ def make(project):
 
     return Status.SUCCESS
 
+
 def update(project):
     pass
-    
+
+
 def compatible(project):
     support = Support.MASK & (~Support.PROJECT)
     if os.path.isfile("compile.hxml"):
         support |= Support.PROJECT
     return support
-

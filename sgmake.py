@@ -154,7 +154,7 @@ def detect_project():
         # if not steps.step("detect", plugin, project):
 
     # Add required steps to project
-    for plugin_type in steps.steps.iterkeys():
+    for plugin_type in iter(steps.steps.keys()):
         if plugin_type == "detect":
             continue
         for plugin in steps.steps[plugin_type]:
@@ -164,7 +164,7 @@ def detect_project():
                 project.steps += [plugin]
 
     project.events = {}
-    for plugin_type in events.events.iterkeys():
+    for plugin_type in iter(events.events.keys()):
         project.events[plugin_type] = []
         for plugin in events.events[plugin_type]:
             plugin = Plugin("events", plugin_type, plugin)

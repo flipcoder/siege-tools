@@ -16,7 +16,7 @@ Currently, the only tools ready for use are SiegeMake (sgmake) and SiegeRun (sgr
 
 ## Components ##
 
-###sgmake (SiegeMake)###
+### sgmake ("siege make") ###
 
 sgmake is a build automation system.  It's job is to intelligently select and run the specific steps required by common build systems by analyzing the given directories (usually just the current directory), figuring out which build system was intended for the projects found, and attempting to build the projects.  It takes into account limitations of the current platform, the project, and those rules set up by the user through config files.
 If no build system is found, it can look at the filetypes and even analyze the source files to see if the project can still be built.
@@ -141,7 +141,7 @@ You may also want to run the application once the build finishes:
     " (R)un the associated program using sgrun
     nmap <leader>r :w<cr>:Dispatch! sgrun<cr>
 
-###sgrun (SiegeRun)###
+### sgrun ("siege run") ###
 
 Ever tried to simply run a program while editing its code in a deep nested
 directory?  SiegeRun digs deep, attempts to figure out which binary you intended to run, and runs it.

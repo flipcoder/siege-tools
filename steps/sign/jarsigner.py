@@ -25,7 +25,7 @@ def sign(project):
         print("Nothing to sign.")
         return
 
-    timestamp_flags = "-tsa http://tsa.starfieldtech.com"
+    timestamp_flags = "-tsa http://timestamp.sectigo.com"
     digest_flags = "-digestalg SHA1"
     alias = Settings.get("keystore_name")
     alias = alias if alias else ""
